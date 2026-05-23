@@ -1,4 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { AiChat } from "@/components/site/AiChat";
 import {
   Outlet,
   Link,
@@ -114,6 +115,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <CartProvider>
         <Outlet />
+        <AiChat /> 
       </CartProvider>
     </QueryClientProvider>
   );
