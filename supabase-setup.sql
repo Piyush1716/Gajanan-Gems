@@ -86,3 +86,6 @@ CREATE TABLE IF NOT EXISTS categories (
 
 ALTER TABLE products
 ADD COLUMN category_id BIGINT REFERENCES categories(id);
+
+-- 5. Add an "available" column to track product availability
+ALTER TABLE products ADD COLUMN available boolean NOT NULL DEFAULT true;

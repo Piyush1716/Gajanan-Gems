@@ -39,6 +39,7 @@ export type ProductRow = {
   image_url: string | null;        // filename / path in the `products` bucket
   created_at: string;
   category_id: number | null;
+  available: boolean;
   // joined via select("*, categories(*)") — optional
   categories?: CategoryRow | null;
 };
@@ -166,6 +167,7 @@ export async function fetchProducts(): Promise<Product[]> {
   const { data, error } = await supabase
     .from("products")
     .select("*, categories(*)")
+    .eq("available", true)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
@@ -186,6 +188,7 @@ export async function fetchProductById(id: number): Promise<Product | null> {
     .from("products")
     .select("*, categories(*)")
     .eq("id", id)
+    .eq("available", true)
     .single();
 
   if (error) return null;
@@ -210,6 +213,7 @@ export async function fetchProductsByCategory(categorySlug: string): Promise<Pro
     .from("products")
     .select("*, categories(*)")
     .eq("category_id", catData.id)
+    .eq("available", true)
     .order("created_at", { ascending: false });
 
   if (error) throw new Error(error.message);
