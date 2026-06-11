@@ -201,3 +201,34 @@
     letter-spacing: -0.01em;
   }
 }
+
+@layer components {
+  .prose-policy p {
+    margin-bottom: 1rem;
+    line-height: 1.75;
+    color: var(--color-muted-foreground);
+  }
+  .prose-policy h4 {
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
+    color: var(--color-foreground);
+    font-size: 1.125rem;
+    font-weight: 600;
+  }
+  .prose-policy ol,
+  .prose-policy ul {
+    margin-bottom: 1rem;
+    padding-left: 1.25rem;
+    line-height: 1.75;
+    color: var(--color-muted-foreground);
+  }
+  .prose-policy ol {
+    list-style: decimal;
+  }
+  .prose-policy ul {
+    list-style: disc;
+  }
+  .prose-policy li {
+    margin-bottom: 0.4rem;
+  }
+}

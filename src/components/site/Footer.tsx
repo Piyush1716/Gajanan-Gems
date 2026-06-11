@@ -1,4 +1,21 @@
+import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube, Mail, Phone } from "lucide-react";
+
+const policyLinks = [
+  { to: "/privacy-policy", label: "Privacy Policy" },
+  { to: "/terms-conditions", label: "Terms & Conditions" },
+  { to: "/returns-refund-policy", label: "Returns & Refund Policy" },
+  { to: "/shipping-policy", label: "Shipping Policy" },
+] as const;
+
+const quickLinks = [
+  { to: "/about-us", label: "About Us" },
+  { to: "/contact-us", label: "Contact Us" },
+  { to: "/faq", label: "FAQ" },
+  { to: "/order-tracking", label: "Order Tracking" },
+  { to: "/bulk-order", label: "Bulk Order" },
+  { to: "/customized-bracelet", label: "Custom Bracelet" },
+] as const;
 
 export function Footer() {
   return (
@@ -16,18 +33,23 @@ export function Footer() {
           </div>
         </div>
         <div>
-          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Shop</h4>
+          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Quick Links</h4>
           <ul className="space-y-2 text-sm" style={{ color: "rgba(248,243,238,0.70)" }}>
-            <li><a href="#">Bracelets</a></li><li><a href="#">Pendants</a></li>
-            <li><a href="#">Gemstone Trees</a></li><li><a href="#">Pyramids & Spheres</a></li>
-            <li><a href="#">Home Decor</a></li>
+            {quickLinks.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="hover:text-primary transition-colors">{l.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
-          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Help</h4>
+          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Policies</h4>
           <ul className="space-y-2 text-sm" style={{ color: "rgba(248,243,238,0.70)" }}>
-            <li><a href="#">Track Order</a></li><li><a href="#">Shipping & Returns</a></li>
-            <li><a href="#">FAQ</a></li><li><a href="#">Contact Us</a></li>
+            {policyLinks.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="hover:text-primary transition-colors">{l.label}</Link>
+              </li>
+            ))}
           </ul>
         </div>
         <div>
