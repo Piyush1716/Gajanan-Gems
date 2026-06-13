@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 import { supabase } from "@/lib/supabase";
-import { Search, Package, CheckCircle2, Clock, Truck, XCircle, Loader2 } from "lucide-react";
+import { Search, Package, CheckCircle2, Clock, Truck, XCircle, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 
 export const Route = createFileRoute("/order-tracking")({
   head: () => ({
@@ -24,7 +24,17 @@ export const Route = createFileRoute("/order-tracking")({
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type OrderStatus = "payment_pending" | "pending" | "confirmed" | "processing" | "shipped" | "delivered" | "cancelled";
+type OrderStatus = 
+  | "cart_abandoned"           // User left checkout without paying
+  | "payment_pending"          // Payment being processed (awaiting confirmation)
+  | "payment_failed"           // Payment failed (network, card declined, etc.)
+  | "payment_cancelled"        // User cancelled payment (dismissed modal)
+  | "pending"                  // Order created, awaiting confirmation
+  | "confirmed"                // Payment confirmed, order confirmed
+  | "processing"               // Order being packed
+  | "shipped"                  // Order dispatched
+  | "delivered"                // Order delivered
+  | "cancelled";               // Order cancelled by admin or user
 
 type OrderItem = {
   id: number;
@@ -44,6 +54,7 @@ type Order = {
   shipping: number;
   total: number;
   payment_method: string;
+  payment_error?: string | null;  // Error message if payment failed
   order_items: OrderItem[];
 };
 
@@ -51,56 +62,105 @@ type Order = {
 
 const STATUS_CONFIG: Record<
   OrderStatus,
-  { label: string; color: string; bg: string; icon: React.ElementType; description: string }
+  { 
+    label: string
+    color: string
+    bg: string
+    icon: React.ElementType
+    description: string
+    isTerminal: boolean  // Can't be recovered from
+    actionable: boolean  // User can take action (retry, complete, etc)
+  }
 > = {
+  cart_abandoned: {
+    label: "Incomplete Checkout",
+    color: "text-slate-700",
+    bg: "bg-slate-50 border-slate-200",
+    icon: AlertCircle,
+    description: "You started checkout but didn't complete payment. Your cart items are still saved.",
+    isTerminal: false,
+    actionable: true,
+  },
   payment_pending: {
     label: "Payment Pending",
     color: "text-orange-700",
     bg: "bg-orange-50 border-orange-200",
     icon: Clock,
-    description: "Payment is being processed. If you paid, please wait a moment for confirmation.",
+    description: "Payment is being processed. If you paid, please wait a moment for confirmation. This usually takes 30 seconds.",
+    isTerminal: false,
+    actionable: false,
+  },
+  payment_failed: {
+    label: "Payment Failed",
+    color: "text-red-700",
+    bg: "bg-red-50 border-red-200",
+    icon: XCircle,
+    description: "Your payment couldn't be processed. This could be due to insufficient funds, incorrect card details, network issues, or bank restrictions.",
+    isTerminal: false,
+    actionable: true,
+  },
+  payment_cancelled: {
+    label: "Payment Cancelled",
+    color: "text-amber-700",
+    bg: "bg-amber-50 border-amber-200",
+    icon: AlertCircle,
+    description: "You cancelled the payment. Your order is on hold. Restart payment to complete your order.",
+    isTerminal: false,
+    actionable: true,
   },
   pending: {
     label: "Pending",
     color: "text-yellow-700",
     bg: "bg-yellow-50 border-yellow-200",
     icon: Clock,
-    description: "Your order has been received and is awaiting confirmation.",
+    description: "Your order has been received and is awaiting confirmation from our team.",
+    isTerminal: false,
+    actionable: false,
   },
   confirmed: {
     label: "Confirmed",
     color: "text-blue-700",
     bg: "bg-blue-50 border-blue-200",
     icon: CheckCircle2,
-    description: "Your order has been confirmed and is being prepared.",
+    description: "Your payment is confirmed and your order is being prepared.",
+    isTerminal: false,
+    actionable: false,
   },
   processing: {
     label: "Processing",
     color: "text-purple-700",
     bg: "bg-purple-50 border-purple-200",
     icon: Package,
-    description: "Your order is being packed and prepared for dispatch.",
+    description: "Your order is being packed and prepared for dispatch. Shipping label created.",
+    isTerminal: false,
+    actionable: false,
   },
   shipped: {
     label: "Shipped",
     color: "text-indigo-700",
     bg: "bg-indigo-50 border-indigo-200",
     icon: Truck,
-    description: "Your order is on its way! Expect delivery within 3-5 business days.",
+    description: "Your order is on its way! Expect delivery within 3-5 business days. You'll receive tracking updates.",
+    isTerminal: false,
+    actionable: false,
   },
   delivered: {
     label: "Delivered",
     color: "text-green-700",
     bg: "bg-green-50 border-green-200",
     icon: CheckCircle2,
-    description: "Your order has been delivered. Enjoy your crystals! 💎",
+    description: "Your order has been delivered. Enjoy your crystals! 💎 If there's any issue, contact us within 48 hours.",
+    isTerminal: true,
+    actionable: false,
   },
   cancelled: {
     label: "Cancelled",
     color: "text-red-700",
     bg: "bg-red-50 border-red-200",
     icon: XCircle,
-    description: "This order has been cancelled. Contact us for assistance.",
+    description: "This order has been cancelled. Your payment (if processed) will be refunded within 5-7 business days.",
+    isTerminal: true,
+    actionable: false,
   },
 };
 
@@ -132,7 +192,7 @@ function OrderTrackingPage() {
     try {
       const { data, error: dbError } = await supabase
         .from("orders")
-        .select("id, status, created_at, first_name, last_name, subtotal, shipping, total, payment_method, order_items(id, title, qty, price, size)")
+        .select("id, status, created_at, first_name, last_name, subtotal, shipping, total, payment_method, payment_error, order_items(id, title, qty, price, size)")
         .eq("id", id)
         .eq("email", email.trim().toLowerCase())
         .single();
@@ -154,6 +214,9 @@ function OrderTrackingPage() {
 
   const stepIndex = order ? STATUS_STEPS.indexOf(order.status as OrderStatus) : -1;
   const statusCfg = order ? STATUS_CONFIG[order.status] ?? STATUS_CONFIG["pending"] : null;
+
+  // Determine if this is an actionable status that needs special handling
+  const isActionableStatus = order && statusCfg && statusCfg.actionable;
 
   return (
     <StaticPageLayout>
@@ -220,18 +283,74 @@ function OrderTrackingPage() {
           <div className="mt-8 space-y-6">
             {/* Status banner */}
             <div className={`rounded-2xl border p-5 ${statusCfg.bg}`}>
-              <div className={`flex items-center gap-3 mb-2 ${statusCfg.color}`}>
-                <statusCfg.icon className="h-5 w-5" />
-                <span className="font-semibold text-lg">Order #{order.id} — {statusCfg.label}</span>
+              <div className={`flex items-start gap-3 mb-3 ${statusCfg.color}`}>
+                <statusCfg.icon className="h-5 w-5 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="font-semibold text-lg block">Order #{order.id} — {statusCfg.label}</span>
+                </div>
               </div>
-              <p className={`text-sm ${statusCfg.color} opacity-80`}>{statusCfg.description}</p>
-              <p className="text-xs text-muted-foreground mt-2">
+              <p className={`text-sm ${statusCfg.color} opacity-80 mb-3`}>{statusCfg.description}</p>
+              
+              {/* Show payment error if exists */}
+              {order.payment_error && (
+                <div className="mt-3 p-3 rounded-lg bg-black/10 text-sm text-foreground">
+                  <p className="font-medium text-red-700">Error: {order.payment_error}</p>
+                </div>
+              )}
+              
+              <p className="text-xs text-muted-foreground mt-3">
                 Placed on {new Date(order.created_at).toLocaleDateString("en-IN", { year: "numeric", month: "long", day: "numeric" })}
               </p>
             </div>
 
-            {/* Progress tracker */}
-            {order.status !== "cancelled" && (
+            {/* Action buttons for actionable statuses */}
+            {isActionableStatus && (
+              <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+                {(order.status === "payment_failed" || order.status === "payment_cancelled") && (
+                  <>
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      Action Required
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your payment wasn't completed. Complete your payment to confirm your order.
+                    </p>
+                    <a
+                      href={`/checkout?retry=${order.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full px-6 py-2.5 text-sm font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Retry Payment
+                    </a>
+                  </>
+                )}
+                
+                {order.status === "cart_abandoned" && (
+                  <>
+                    <h3 className="text-sm font-semibold flex items-center gap-2">
+                      <AlertCircle className="h-4 w-4" />
+                      Complete Your Order
+                    </h3>
+                    <p className="text-sm text-muted-foreground">
+                      Your cart is still saved. Complete checkout to place your order.
+                    </p>
+                    <a
+                      href={`/checkout?resume=${order.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full px-6 py-2.5 text-sm font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      <RotateCcw className="h-4 w-4" />
+                      Resume Checkout
+                    </a>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Progress tracker - only show for non-terminal, non-actionable statuses */}
+            {order.status !== "cancelled" && 
+             order.status !== "cart_abandoned" && 
+             order.status !== "payment_failed" && 
+             order.status !== "payment_cancelled" && (
               <div className="rounded-2xl border border-border bg-card p-5">
                 <h3 className="text-sm font-semibold mb-4">Order Progress</h3>
                 <div className="relative flex items-center justify-between">

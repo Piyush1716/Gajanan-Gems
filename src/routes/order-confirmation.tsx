@@ -6,10 +6,10 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/order-confirmation")({
   validateSearch: z.object({
-    orderId:    z.string().optional(),
-    firstName:  z.string().optional(),
-    total:      z.string().optional(),
-    payMethod:  z.string().optional(),
+    orderId: z.string().optional(),
+    firstName: z.string().optional(),
+    total: z.string().optional(),
+    payMethod: z.string().optional(),
   }),
   head: () => ({
     meta: [
@@ -25,8 +25,13 @@ function OrderConfirmationPage() {
   const { orderId, firstName, total, payMethod } = Route.useSearch();
 
   const payLabel =
-    payMethod === "razorpay" ? "Razorpay (Online)"
-    : payMethod ?? "Online Payment";
+    payMethod === "razorpay"
+      ? "Razorpay (Online)"
+      : payMethod
+        ? payMethod
+        : "Online Payment";
+
+  const displayAmount = total ? parseInt(total).toLocaleString() : "N/A";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -45,7 +50,8 @@ function OrderConfirmationPage() {
             {firstName ? `Thank you, ${firstName}! 🎉` : "Order Confirmed! 🎉"}
           </h1>
           <p className="text-muted-foreground mb-8">
-            Your order has been placed successfully. We'll send a confirmation to your email shortly.
+            Your order has been placed successfully. We'll send a confirmation to your email shortly and get started on
+            preparing your order.
           </p>
 
           {/* Order details card */}
@@ -53,21 +59,24 @@ function OrderConfirmationPage() {
             <div className="border border-border rounded-2xl bg-card p-6 mb-8 text-left space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Order ID</span>
-                <span className="font-semibold">#{orderId}</span>
+                <span className="font-semibold font-mono">#{orderId}</span>
               </div>
               {total && (
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Amount</span>
-                  <span className="font-semibold">₹{parseInt(total).toLocaleString()}</span>
+                  <span className="text-muted-foreground">Amount Paid</span>
+                  <span className="font-semibold">₹{displayAmount}</span>
                 </div>
               )}
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Payment</span>
+                <span className="text-muted-foreground">Payment Method</span>
                 <span className="font-semibold">{payLabel}</span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-muted-foreground">Estimated delivery</span>
+                <span className="text-muted-foreground">Estimated Delivery</span>
                 <span className="font-semibold">5–7 business days</span>
+              </div>
+              <div className="text-xs text-muted-foreground pt-2 border-t border-border">
+                💡 Save this Order ID for tracking and support inquiries
               </div>
             </div>
           )}
@@ -77,18 +86,41 @@ function OrderConfirmationPage() {
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <Mail className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Check your email</p>
-              <p className="text-xs text-muted-foreground">Order confirmation sent to your inbox</p>
+              <p className="text-xs text-muted-foreground">Confirmation and invoice sent to your inbox</p>
             </div>
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <Package className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Track your order</p>
-              <p className="text-xs text-muted-foreground">Use your Order ID &amp; email to track</p>
+              <p className="text-xs text-muted-foreground">Use your Order ID & email to track anytime</p>
             </div>
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <MessageCircle className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Need help?</p>
               <p className="text-xs text-muted-foreground">WhatsApp +91 63515 63768</p>
             </div>
+          </div>
+
+          {/* Order info section */}
+          <div className="rounded-xl border border-border bg-card p-5 mb-8 text-left">
+            <h3 className="font-semibold text-sm mb-3">What happens next?</h3>
+            <ul className="space-y-2 text-sm text-muted-foreground">
+              <li className="flex gap-2">
+                <span className="text-primary font-bold">1.</span>
+                <span>We'll verify your payment and send a confirmation email</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold">2.</span>
+                <span>Your order will be packed with care within 24 hours</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold">3.</span>
+                <span>You'll receive shipping updates via WhatsApp & email</span>
+              </li>
+              <li className="flex gap-2">
+                <span className="text-primary font-bold">4.</span>
+                <span>Expect delivery within 5–7 business days</span>
+              </li>
+            </ul>
           </div>
 
           {/* CTAs */}
@@ -105,6 +137,28 @@ function OrderConfirmationPage() {
             >
               Continue Shopping
             </Link>
+          </div>
+
+          {/* Support section */}
+          <div className="mt-8 pt-6 border-t border-border text-center text-xs text-muted-foreground">
+            <p className="mb-3">Have questions about your order?</p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <a
+                href="mailto:hello@gajanangems.com"
+                className="text-primary hover:underline font-medium"
+              >
+                📧 Email us
+              </a>
+              <span className="hidden sm:inline text-border">•</span>
+              <a
+                href="https://wa.me/916351563768"
+                className="text-primary hover:underline font-medium"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                💬 WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </main>
