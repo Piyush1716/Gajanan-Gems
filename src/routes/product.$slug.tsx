@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
-import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft } from "lucide-react";
+import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft, ShoppingBag, ArrowRight } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { fetchProductBySlug, fetchProducts, type Product } from "@/lib/products";
@@ -174,7 +174,8 @@ function ProductPage() {
   const isWishlisted = wishlistHas(product.slug);
 
   const handleAddToCart = () => add(product.slug, qty, size);
-  const handleBuyNow = () => {
+  
+  const handleOrderNow = () => {
     add(product.slug, qty, size);
     navigate({ to: "/checkout" });
   };
@@ -183,136 +184,138 @@ function ProductPage() {
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
       <main className="flex-1">
-        <nav className="max-w-7xl mx-auto px-4 lg:px-6 pt-5 text-xs sm:text-sm text-muted-foreground flex items-center gap-1 flex-wrap">
-          <Link to="/" className="hover:text-primary">Home</Link>
-          <ChevronRight className="h-3 w-3" />
-          <span>Products</span>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground line-clamp-1">{product.name}</span>
-        </nav>
+        {/* Product section */}
+        <section className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-12 grid lg:grid-cols-2 gap-8 lg:gap-12">
+          {/* Left: Gallery */}
+          <ProductGallery gallery={product.gallery} productName={product.name} hasDiscount={!!product.old} />
 
-        <section className="max-w-7xl mx-auto px-4 lg:px-6 py-6 sm:py-10 grid lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Gallery */}
-          <ProductGallery
-            gallery={product.gallery}
-            productName={product.name}
-            hasDiscount={!!product.old}
-          />
+          {/* Right: Details */}
+          <div className="flex flex-col justify-between">
+            <div>
+              {product.categoryName && (
+                <Link to="/category/$slug" params={{ slug: product.categorySlug! }} className="text-xs uppercase tracking-wider text-primary font-semibold hover:underline">
+                  {product.categoryName}
+                </Link>
+              )}
+              <h1 className="text-3xl lg:text-4xl font-semibold mt-2 mb-4">{product.name}</h1>
 
-          {/* Info */}
-          <div>
-            {product.tag && (
-              <span className="inline-block bg-primary text-primary-foreground text-[10px] uppercase tracking-wider px-3 py-1 rounded-full mb-3">
-                {product.tag}
-              </span>
-            )}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-semibold mb-3">{product.name}</h1>
-
-            {(product.rating !== undefined) && (
-              <div className="flex items-center gap-2 mb-4">
-                <div className="flex">
-                  {[1, 2, 3, 4, 5].map((s) => (
-                    <Star key={s} className={`h-4 w-4 ${s <= Math.round(product.rating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
-                  ))}
-                </div>
-                <span className="text-sm text-muted-foreground">({product.reviews} reviews)</span>
-              </div>
-            )}
-
-            <div className="flex items-baseline gap-3 mb-5">
-              <span className="text-3xl font-bold text-primary">₹{product.price}</span>
-              {product.old && (
-                <>
-                  <span className="text-lg text-muted-foreground line-through">₹{product.old}</span>
-                  <span className="text-sm bg-secondary text-secondary-foreground px-2 py-0.5 rounded font-medium">
-                    Save ₹{product.old - product.price}
+              {/* Rating */}
+              {product.rating !== undefined && (
+                <div className="flex items-center gap-2 mb-4">
+                  <div className="flex">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} className={`h-4 w-4 ${s <= Math.round(product.rating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
+                    ))}
+                  </div>
+                  <span className="text-sm text-muted-foreground">
+                    {product.rating} ({product.reviews} reviews)
                   </span>
-                </>
+                </div>
+              )}
+
+              {/* Price */}
+              <div className="flex items-center gap-3 mb-6">
+                <span className="text-3xl font-bold">₹{product.price.toLocaleString()}</span>
+                {product.old && (
+                  <>
+                    <span className="text-lg text-muted-foreground line-through">₹{product.old}</span>
+                    <span className="text-sm bg-secondary text-secondary-foreground px-2 py-0.5 rounded font-medium">
+                      Save ₹{product.old - product.price}
+                    </span>
+                  </>
+                )}
+              </div>
+
+              {product.shortDescription && (
+                <p className="text-muted-foreground text-sm sm:text-base mb-6 leading-relaxed">
+                  {product.shortDescription}
+                </p>
+              )}
+
+              {/* Size selector */}
+              {product.sizes && product.sizes.length > 0 && (
+                <div className="mb-6">
+                  <p className="text-sm font-medium mb-2">Beads Size (mm)</p>
+                  <div className="flex flex-wrap gap-2">
+                    {product.sizes.map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => setSize(s)}
+                        className={`px-3 py-1.5 text-sm border rounded-full transition ${size === s ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity selector */}
+              <div className="flex items-center gap-4 mb-6">
+                <div className="flex items-center border border-border rounded-full overflow-hidden">
+                  <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2.5 hover:bg-secondary transition">
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="px-4 py-2.5 min-w-[3rem] text-center font-medium">{qty}</span>
+                  <button onClick={() => setQty(qty + 1)} className="px-4 py-2.5 hover:bg-secondary transition">
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+                <button
+                  onClick={() => wishlistToggle(product.slug)}
+                  aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
+                  className="p-3 border rounded-full transition-colors hover:border-primary"
+                  style={isWishlisted ? { borderColor: "#ef4444" } : {}}
+                >
+                  <Heart className={`h-5 w-5 transition-colors ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
+                </button>
+              </div>
+
+              {/* Action buttons */}
+              <div className="grid grid-cols-2 gap-3 mb-6">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex items-center justify-center gap-2 rounded-full py-3 font-medium transition-colors border-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                >
+                  <ShoppingBag className="h-4 w-4" />
+                  Add to Cart
+                </button>
+                <button
+                  onClick={handleOrderNow}
+                  className="flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full py-3 font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Order Now
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="bg-secondary/50 rounded-xl p-4 text-sm space-y-2 mb-6">
+                <p className="font-medium">Want a perfect fit?</p>
+                <p className="text-muted-foreground">Mention your wrist size in the order notes 💖. For sizes larger than 7 inches a small charge is added; smaller sizes ship with the extra beads.</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3 text-center text-xs">
+                <div className="p-3 border border-border rounded-lg">
+                  <Truck className="h-5 w-5 mx-auto mb-1 text-primary" />
+                  Free Delivery
+                </div>
+                <div className="p-3 border border-border rounded-lg">
+                  <ShieldCheck className="h-5 w-5 mx-auto mb-1 text-primary" />
+                  100% Authentic
+                </div>
+                <div className="p-3 border border-border rounded-lg">
+                  <Sparkles className="h-5 w-5 mx-auto mb-1 text-primary" />
+                  Cleansed & Charged
+                </div>
+              </div>
+
+              {product.categoryName && (
+                <p className="text-xs text-muted-foreground mt-6">
+                  <span className="font-medium text-foreground">Category:</span> {product.categoryName}
+                  {product.stone && <> · <span className="font-medium text-foreground">Stone:</span> {product.stone}</>}
+                </p>
               )}
             </div>
-
-            {product.shortDescription && (
-              <p className="text-muted-foreground text-sm sm:text-base mb-6 leading-relaxed">
-                {product.shortDescription}
-              </p>
-            )}
-
-            {product.sizes && product.sizes.length > 0 && (
-              <div className="mb-6">
-                <p className="text-sm font-medium mb-2">Beads Size (mm)</p>
-                <div className="flex flex-wrap gap-2">
-                  {product.sizes.map((s) => (
-                    <button
-                      key={s}
-                      onClick={() => setSize(s)}
-                      className={`px-3 py-1.5 text-sm border rounded-full transition ${size === s ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary"}`}
-                    >
-                      {s}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center gap-4 mb-5">
-              <div className="flex items-center border border-border rounded-full overflow-hidden">
-                <button onClick={() => setQty(Math.max(1, qty - 1))} className="px-4 py-2.5 hover:bg-secondary transition">
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="px-4 py-2.5 min-w-[3rem] text-center font-medium">{qty}</span>
-                <button onClick={() => setQty(qty + 1)} className="px-4 py-2.5 hover:bg-secondary transition">
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
-              <button
-                onClick={handleAddToCart}
-                className="flex-1 rounded-full py-3 font-medium transition-colors border border-primary text-primary hover:bg-primary hover:text-white"
-              >
-                Add to Cart
-              </button>
-              <button
-                onClick={() => wishlistToggle(product.slug)}
-                aria-label={isWishlisted ? "Remove from wishlist" : "Add to wishlist"}
-                className="p-3 border rounded-full transition-colors hover:border-primary"
-                style={isWishlisted ? { borderColor: "#ef4444" } : {}}
-              >
-                <Heart className={`h-5 w-5 transition-colors ${isWishlisted ? "fill-red-500 text-red-500" : ""}`} />
-              </button>
-            </div>
-
-            <button
-              onClick={handleBuyNow}
-              className="w-full bg-primary text-primary-foreground rounded-full py-3 font-medium hover:bg-primary/90 transition-colors mb-6"
-            >
-              Buy Now
-            </button>
-
-            <div className="bg-secondary/50 rounded-xl p-4 text-sm space-y-2 mb-6">
-              <p className="font-medium">Want a perfect fit?</p>
-              <p className="text-muted-foreground">Mention your wrist size in the order notes 💖. For sizes larger than 7 inches a small charge is added; smaller sizes ship with the extra beads.</p>
-            </div>
-
-            <div className="grid grid-cols-3 gap-3 text-center text-xs">
-              <div className="p-3 border border-border rounded-lg">
-                <Truck className="h-5 w-5 mx-auto mb-1 text-primary" />
-                Free Delivery
-              </div>
-              <div className="p-3 border border-border rounded-lg">
-                <ShieldCheck className="h-5 w-5 mx-auto mb-1 text-primary" />
-                100% Authentic
-              </div>
-              <div className="p-3 border border-border rounded-lg">
-                <Sparkles className="h-5 w-5 mx-auto mb-1 text-primary" />
-                Cleansed & Charged
-              </div>
-            </div>
-
-            {product.categoryName && (
-              <p className="text-xs text-muted-foreground mt-6">
-                <span className="font-medium text-foreground">Category:</span> {product.categoryName}
-                {product.stone && <> · <span className="font-medium text-foreground">Stone:</span> {product.stone}</>}
-              </p>
-            )}
           </div>
         </section>
 

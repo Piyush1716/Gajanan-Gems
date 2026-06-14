@@ -7,6 +7,7 @@ import {
   useRouter,
 } from "@tanstack/react-router";
 
+import { CartSidebar } from "@/components/site/CartSidebar";
 import { CartProvider } from "@/lib/cart";
 import { WishlistProvider } from "@/lib/wishlist";
 import { Toaster } from "@/components/ui/sonner";
@@ -82,6 +83,7 @@ function RootComponent() {
       <WishlistProvider>
         <CartProvider>
           <Outlet />
+          <CartSidebar />
           <AiChat />
           <Toaster position="bottom-left" richColors />
         </CartProvider>

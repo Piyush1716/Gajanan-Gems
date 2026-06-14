@@ -49,6 +49,7 @@ export type CategoryRow = {
   slug: string;
   image_url: string | null;
   created_at: string;
+  available?: boolean;  // NEW: Track category availability
 };
 
 export type Product = ProductRow & {
@@ -75,6 +76,7 @@ export type Category = {
   slug: string;
   name: string;
   img: string;
+  available: boolean;    // NEW: Track category availability
   description?: string;
 };
 
@@ -126,13 +128,33 @@ function normaliseCategory(row: CategoryRow): Category {
     slug:        row.slug,
     name:        row.name,
     img:         categoryImageUrl(row.image_url),
+    available:   row.available ?? true,  // NEW: Default to true for backward compatibility
     description: undefined,
   };
 }
 
 // ─── Category fetching ────────────────────────────────────────────────────────
 
+/**
+ * Fetch all available categories
+ * NEW: Filters by available = true
+ */
 export async function fetchCategories(): Promise<Category[]> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .eq("available", true)  // NEW: Only fetch available categories
+    .order("name", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(normaliseCategory);
+}
+
+/**
+ * Fetch all categories including unavailable ones
+ * (for admin purposes)
+ */
+export async function fetchAllCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from("categories")
     .select("*")
@@ -147,6 +169,7 @@ export async function fetchCategoryBySlug(slug: string): Promise<Category | null
     .from("categories")
     .select("*")
     .eq("slug", slug)
+    .eq("available", true)  // NEW: Only fetch available categories
     .single();
 
   if (error) return null;
@@ -203,6 +226,7 @@ export async function fetchProductsByCategory(categorySlug: string): Promise<Pro
     .from("categories")
     .select("id")
     .eq("slug", categorySlug)
+    .eq("available", true)  // NEW: Only fetch from available categories
     .single();
 
   if (catError || !catData) return [];
