@@ -11,4 +11,15 @@ export default defineConfig({
     tailwindcss(),
     tsconfigPaths(),
   ],
+  server: {
+    proxy: {
+      // Forward /api/* to the local dev API server (server.js)
+      // Run `node server.js` in a separate terminal before `npm run dev`
+      "/api": {
+        target: "http://localhost:3001",
+        changeOrigin: true,
+      },
+    },
+  },
 });
+

@@ -52,8 +52,8 @@ interface RazorpayOptions {
 
 interface RazorpayResponse {
   razorpay_payment_id: string;
-  razorpay_order_id?: string;
-  razorpay_signature?: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
 }
 
 interface RazorpayInstance {
@@ -181,6 +181,8 @@ function CheckoutPage() {
   const [paymentAttemptError, setPaymentAttemptError] = useState<string | null>(null);
   const pendingOrderId = useRef<number | null>(null);
   const paymentRetryCount = useRef(0);
+  // Razorpay order ID returned by /api/create-order (server-generated)
+  const rzpOrderIdRef = useRef<string | null>(null);
 
   const total = subtotal; // Free delivery
 
@@ -198,17 +200,62 @@ function CheckoutPage() {
 
   const handlePaymentSuccess = async (
     orderId: number,
+    attemptNumber: number,
     billing: BillingFormData,
     response: RazorpayResponse
   ) => {
     try {
-      // Update order status to confirmed
+      // ── Step 1: Verify signature server-side ────────────────────────────────
+      const verifyRes = await fetch("/api/verify-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          razorpay_order_id:  response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature:  response.razorpay_signature,
+        }),
+      });
+
+      const verifyContentType = verifyRes.headers.get("content-type") ?? "";
+      const verifyData = verifyContentType.includes("application/json")
+        ? await verifyRes.json()
+        : { success: false, error: "Verification API returned a non-JSON response" };
+
+      if (!verifyRes.ok || !verifyData.success) {
+        const errMsg = verifyData?.error ?? "Signature verification failed";
+        console.error("[checkout] Signature verification failed:", errMsg);
+
+        // Log failed attempt
+        await supabase.from("payment_attempts").update({
+          status: "failed",
+          error_message: errMsg,
+          updated_at: new Date().toISOString(),
+        }).eq("order_id", orderId).eq("attempt_number", attemptNumber);
+
+        toast.error("Payment could not be verified. Please contact support.");
+        setPaymentAttemptError(
+          "Payment signature verification failed. Please contact hello@gajanangems.com with your payment ID: " +
+          response.razorpay_payment_id
+        );
+        setPlacing(false);
+        return;
+      }
+
+      // ── Step 2: Update payment_attempts to success ──────────────────────────
+      await supabase.from("payment_attempts").update({
+        status: "success",
+        razorpay_payment_id: response.razorpay_payment_id,
+        payment_response: response as unknown as Record<string, unknown>,
+        updated_at: new Date().toISOString(),
+      }).eq("order_id", orderId).eq("attempt_number", attemptNumber);
+
+      // ── Step 3: Confirm the order ───────────────────────────────────────────
       const { error } = await supabase
         .from("orders")
         .update({
           status: "confirmed",
           razorpay_payment_id: response.razorpay_payment_id,
-          payment_error: null, // Clear any previous error
+          payment_error: null,
         })
         .eq("id", orderId);
 
@@ -216,45 +263,63 @@ function CheckoutPage() {
         throw new Error(`Failed to confirm order: ${error.message}`);
       }
 
+      // ── Step 3.5: Send Confirmation Email via Supabase Edge Function ────────
+      supabase.functions.invoke("send-order-email", {
+        body: { 
+          email: billing.email, 
+          firstName: billing.firstName, 
+          orderId, 
+          total 
+        }
+      }).catch(err => console.error("[checkout] Email send failed:", err));
+
       clear();
       toast.success("Payment successful! Your order is confirmed.");
-      navigate({
-        to: "/order-confirmation",
-        search: {
-          orderId: String(orderId),
-          firstName: billing.firstName,
-          total: String(total),
-          payMethod: "razorpay",
-        },
-      });
+      // Store confirmation data in sessionStorage instead of URL query params
+      // Prevents leakage via browser history, server logs, and referrer headers
+      try {
+        sessionStorage.setItem(
+          "gajanan_order_confirm",
+          JSON.stringify({ orderId, firstName: billing.firstName, total, payMethod: "razorpay" })
+        );
+      } catch { /* sessionStorage unavailable — safe to ignore */ }
+      navigate({ to: "/order-confirmation", search: { orderId: String(orderId) } });
     } catch (err) {
       console.error("Error confirming order:", err);
       toast.error("Payment received but order confirmation failed. Contact support with Order ID #" + orderId);
-      // Still navigate to confirmation since payment was received
-      navigate({
-        to: "/order-confirmation",
-        search: {
-          orderId: String(orderId),
-          firstName: billing.firstName,
-          total: String(total),
-          payMethod: "razorpay",
-        },
-      });
+      // Still navigate — payment was received and verified
+      try {
+        sessionStorage.setItem(
+          "gajanan_order_confirm",
+          JSON.stringify({ orderId, firstName: billing.firstName, total, payMethod: "razorpay" })
+        );
+      } catch { /* sessionStorage unavailable — safe to ignore */ }
+      navigate({ to: "/order-confirmation", search: { orderId: String(orderId) } });
     }
   };
 
   // ── Handle payment failure ──────────────────────────────────────────────────
 
-  const handlePaymentFailure = async (orderId: number, errorMessage: string) => {
+  const handlePaymentFailure = async (
+    orderId: number,
+    attemptNumber: number,
+    errorMessage: string
+  ) => {
     try {
-      // Update order status to payment_failed with error message
-      await supabase
-        .from("orders")
-        .update({
+      await Promise.all([
+        // Update payment_attempts row
+        supabase.from("payment_attempts").update({
+          status: "failed",
+          error_message: errorMessage,
+          updated_at: new Date().toISOString(),
+        }).eq("order_id", orderId).eq("attempt_number", attemptNumber),
+
+        // Update order status
+        supabase.from("orders").update({
           status: "payment_failed",
           payment_error: errorMessage,
-        })
-        .eq("id", orderId);
+        }).eq("id", orderId),
+      ]);
 
       setPaymentAttemptError(errorMessage);
       toast.error(`Payment failed: ${errorMessage}`);
@@ -267,16 +332,20 @@ function CheckoutPage() {
 
   // ── Handle payment cancellation ────────────────────────────────────────────
 
-  const handlePaymentCancelled = async (orderId: number) => {
+  const handlePaymentCancelled = async (orderId: number, attemptNumber: number) => {
     try {
-      // Update order status to payment_cancelled
-      await supabase
-        .from("orders")
-        .update({
+      await Promise.all([
+        supabase.from("payment_attempts").update({
+          status: "cancelled",
+          error_message: "User cancelled the payment",
+          updated_at: new Date().toISOString(),
+        }).eq("order_id", orderId).eq("attempt_number", attemptNumber),
+
+        supabase.from("orders").update({
           status: "payment_cancelled",
           payment_error: "User cancelled the payment",
-        })
-        .eq("id", orderId);
+        }).eq("id", orderId),
+      ]);
 
       setPaymentAttemptError("You cancelled the payment. Your order is on hold. You can retry payment anytime.");
       toast.info("Payment cancelled. You can retry anytime.");
@@ -289,7 +358,12 @@ function CheckoutPage() {
 
   // ── Open Razorpay overlay ──────────────────────────────────────────────────
 
-  const openRazorpay = async (orderId: number, billing: BillingFormData) => {
+  const openRazorpay = async (
+    orderId: number,
+    attemptNumber: number,
+    rzpOrderId: string,
+    billing: BillingFormData
+  ) => {
     const RAZORPAY_KEY = import.meta.env.VITE_RAZORPAY_KEY_ID as string | undefined;
 
     if (!RAZORPAY_KEY) {
@@ -304,8 +378,11 @@ function CheckoutPage() {
       currency: "INR",
       name: "GajananGems",
       description: `Order #${orderId} — Healing Crystals & Jewellery`,
+      // order_id ties this modal to the server-side Razorpay order
+      // This is required for Standard Checkout signature verification
+      order_id: rzpOrderId,
       handler: async (response: RazorpayResponse) => {
-        await handlePaymentSuccess(orderId, billing, response);
+        await handlePaymentSuccess(orderId, attemptNumber, billing, response);
       },
       prefill: {
         name: `${billing.firstName} ${billing.lastName}`,
@@ -318,7 +395,7 @@ function CheckoutPage() {
       theme: { color: "#3F5C45" },
       modal: {
         ondismiss: () => {
-          handlePaymentCancelled(orderId);
+          handlePaymentCancelled(orderId, attemptNumber);
           setPlacing(false);
         },
         confirm_close: true,
@@ -331,7 +408,7 @@ function CheckoutPage() {
       // Handle errors during payment processing
       rzp.on("payment.failed", async (response) => {
         const errorMsg = response.error?.description || "Payment failed. Please try again.";
-        await handlePaymentFailure(orderId, errorMsg);
+        await handlePaymentFailure(orderId, attemptNumber, errorMsg);
         setPlacing(false);
       });
 
@@ -339,7 +416,7 @@ function CheckoutPage() {
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Failed to open payment gateway";
       toast.error(errorMsg);
-      await handlePaymentFailure(orderId, errorMsg);
+      await handlePaymentFailure(orderId, attemptNumber, errorMsg);
       setPlacing(false);
     }
   };
@@ -356,7 +433,7 @@ function CheckoutPage() {
     setPaymentAttemptError(null);
 
     try {
-      // Create order in database with "payment_pending" status
+      // ── Step 1: Create order row in Supabase ────────────────────────────────
       const { data, error: createError } = await supabase
         .from("orders")
         .insert([
@@ -375,8 +452,10 @@ function CheckoutPage() {
             shipping: 0, // Free delivery
             total,
             payment_method: "razorpay",
-            status: "payment_pending", // Initially pending payment
+            status: "payment_pending",
             payment_error: null,
+            payment_retry_count: 0,
+            last_payment_attempt_at: new Date().toISOString(),
           },
         ])
         .select("id")
@@ -388,7 +467,7 @@ function CheckoutPage() {
 
       const orderId = data.id;
 
-      // Create order items
+      // ── Step 2: Insert order items ──────────────────────────────────────────
       const orderItems = items.map((item) => {
         const product = getProduct(item.slug);
         return {
@@ -408,8 +487,60 @@ function CheckoutPage() {
         throw new Error(`Failed to add items to order: ${itemsError.message}`);
       }
 
-      // Open Razorpay payment modal
-      openRazorpay(orderId, billing);
+      // ── Step 3: Create Razorpay order via serverless API ────────────────────
+      // The KEY_SECRET lives only on the server — never in this file
+      const createOrderRes = await fetch("/api/create-order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Math.round(total * 100), // convert ₹ to paise
+          currency: "INR",
+          receipt: `order_${orderId}`,
+        }),
+      });
+
+      // Guard: parse JSON only if the response actually is JSON.
+      // When running locally without `vercel dev`, Vite returns index.html
+      // for unknown /api/* routes, which causes "Unexpected end of JSON input".
+      const contentType = createOrderRes.headers.get("content-type") ?? "";
+      if (!contentType.includes("application/json")) {
+        throw new Error(
+          "Payment API is not available in this environment. " +
+            "Run `vercel dev` locally (instead of `npm run dev`) so the " +
+            "/api/create-order serverless function is served correctly."
+        );
+      }
+
+      const orderData = await createOrderRes.json();
+
+      if (!createOrderRes.ok) {
+        throw new Error(orderData?.error ?? "Failed to create Razorpay order");
+      }
+
+      const rzpOrderId: string = orderData.order_id;
+      rzpOrderIdRef.current = rzpOrderId;
+
+      // ── Step 4: Log payment attempt ─────────────────────────────────────────
+      const attemptNumber = (paymentRetryCount.current ?? 0) + 1;
+      paymentRetryCount.current = attemptNumber;
+
+      await supabase.from("payment_attempts").insert({
+        order_id: orderId,
+        attempt_number: attemptNumber,
+        status: "initiated",
+        razorpay_order_id: rzpOrderId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
+      // Update order retry tracking
+      await supabase.from("orders").update({
+        payment_retry_count: attemptNumber,
+        last_payment_attempt_at: new Date().toISOString(),
+      }).eq("id", orderId);
+
+      // ── Step 5: Open Razorpay modal with the server-generated order_id ──────
+      openRazorpay(orderId, attemptNumber, rzpOrderId, billing);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
       console.error("Checkout error:", err);

@@ -89,3 +89,6 @@ ADD COLUMN category_id BIGINT REFERENCES categories(id);
 
 -- 5. Add an "available" column to track product availability
 ALTER TABLE products ADD COLUMN available boolean NOT NULL DEFAULT true;
+
+-- 6. Add a "bestseller" column to mark best selling products
+ALTER TABLE products ADD COLUMN bestseller boolean NOT NULL DEFAULT false;

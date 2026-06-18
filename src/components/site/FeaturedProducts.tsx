@@ -54,7 +54,7 @@ export function FeaturedProducts() {
 
         {!loading && !error && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-            {products.map((p) => {
+            {products.filter(p => p.bestseller).slice(0, 12).map((p) => {
               const wished = has(p.slug);
               const discount = p.old ? Math.round(((p.old - p.price) / p.old) * 100) : 0;
               return (

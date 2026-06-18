@@ -27,7 +27,7 @@ export function Footer() {
             Your trusted source for authentic healing crystals, gemstone jewellery and spiritual decor since 2012.
           </p>
           <div className="flex gap-3 mt-5">
-            <a href="#" aria-label="Instagram" className="p-2 rounded-full transition-colors" style={{ backgroundColor: "rgba(248,243,238,0.10)" }} onMouseOver={e => (e.currentTarget.style.backgroundColor="#3F5C45")} onMouseOut={e => (e.currentTarget.style.backgroundColor="rgba(248,243,238,0.10)")}><Instagram className="h-4 w-4" /></a>
+            <a href="https://www.instagram.com/gajanangems1?igsh=NGw2eWJteGhwZ25s" aria-label="Instagram" className="p-2 rounded-full transition-colors" style={{ backgroundColor: "rgba(248,243,238,0.10)" }} onMouseOver={e => (e.currentTarget.style.backgroundColor="#3F5C45")} onMouseOut={e => (e.currentTarget.style.backgroundColor="rgba(248,243,238,0.10)")}><Instagram className="h-4 w-4" /></a>
             <a href="#" aria-label="Facebook" className="p-2 rounded-full transition-colors" style={{ backgroundColor: "rgba(248,243,238,0.10)" }} onMouseOver={e => (e.currentTarget.style.backgroundColor="#3F5C45")} onMouseOut={e => (e.currentTarget.style.backgroundColor="rgba(248,243,238,0.10)")}><Facebook className="h-4 w-4" /></a>
             <a href="#" aria-label="YouTube" className="p-2 rounded-full transition-colors" style={{ backgroundColor: "rgba(248,243,238,0.10)" }} onMouseOver={e => (e.currentTarget.style.backgroundColor="#3F5C45")} onMouseOut={e => (e.currentTarget.style.backgroundColor="rgba(248,243,238,0.10)")}><Youtube className="h-4 w-4" /></a>
           </div>
@@ -53,15 +53,11 @@ export function Footer() {
           </ul>
         </div>
         <div>
-          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Newsletter</h4>
-          <p className="text-sm mb-3" style={{ color: "rgba(248,243,238,0.70)" }}>Get crystal tips and 10% off your first order.</p>
-          <form className="flex">
-            <input type="email" required placeholder="Your email" className="flex-1 px-3 py-2 rounded-l-full text-sm outline-none" style={{ backgroundColor: "rgba(248,243,238,0.10)", color: "#F8F3EE" }} />
-            <button className="px-4 rounded-r-full text-sm font-medium" style={{ backgroundColor: "#3F5C45", color: "#F8F3EE" }}>Join</button>
-          </form>
+          <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Contact Us</h4>
+          <p className="text-sm mb-3" style={{ color: "rgba(248,243,238,0.70)" }}>We're here to help! Reach out to us for any queries or support.</p>
           <div className="mt-5 space-y-2 text-sm" style={{ color: "rgba(248,243,238,0.70)" }}>
-            <div className="flex items-center gap-2"><Phone className="h-4 w-4" /> +91 63515 63768</div>
-            <div className="flex items-center gap-2"><Mail className="h-4 w-4" /> hello@gajanangems.com</div>
+            <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><a href="tel:+916351563768"> +91 63515 63768</a></div>
+            <div className="flex items-center gap-2"><Mail className="h-4 w-4" /><a href="mailto:hello@gajanangems.com"> hello@gajanangems.com</a></div>
           </div>
         </div>
       </div>

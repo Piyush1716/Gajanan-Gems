@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
 import bracelets from "@/assets/hero-bracelets.jpg";
 import tree from "@/assets/hero-tree.jpg";
 import spheres from "@/assets/hero-spheres.jpg";
 
 const slides = [
-  { img: bracelets, title: "Bracelets", subtitle: "Best way to absorb the energy of crystals", cta: "Shop Bracelets" },
-  { img: tree, title: "Gemstone Trees", subtitle: "Bring prosperity & positivity home", cta: "Shop Trees" },
-  { img: spheres, title: "Crystal Spheres", subtitle: "Harmony in every facet", cta: "Shop Spheres" },
+  { img: bracelets, title: "Bracelets", subtitle: "Best way to absorb the energy of crystals", cta: "Shop Bracelets", link: "/category/crystal-bracelets" },
+  { img: tree, title: "Gemstone Trees", subtitle: "Bring prosperity & positivity home", cta: "Shop Trees", link: "/category/crystal-trees" },
+  { img: spheres, title: "Crystal Spheres", subtitle: "Harmony in every facet", cta: "Shop Spheres", link: "/category/tumbled-stones" },
 ];
 
 export function HeroSlider() {
+  const navigate = useNavigate();
   const [i, setI] = useState(0);
   useEffect(() => {
     const t = setInterval(() => setI((p) => (p + 1) % slides.length), 5000);
@@ -23,7 +25,7 @@ export function HeroSlider() {
         {slides.map((s, idx) => (
           <div
             key={idx}
-            className="absolute inset-0 transition-opacity duration-700"
+            className={`absolute inset-0 transition-opacity duration-700 ${i === idx ? 'pointer-events-auto' : 'pointer-events-none'}`}
             style={{ opacity: i === idx ? 1 : 0 }}
             aria-hidden={i !== idx}
           >
@@ -39,7 +41,8 @@ export function HeroSlider() {
                 <h1 className="text-5xl md:text-7xl font-semibold mb-4" style={{ color: "#2E2B26" }}>{s.title}</h1>
                 <p className="text-lg md:text-xl mb-6" style={{ color: "rgba(46,43,38,0.80)" }}>{s.subtitle}</p>
                 <button
-                  className="px-7 py-3 rounded-full font-medium transition-colors"
+                  onClick={() => navigate({ to: s.link })}
+                  className="px-7 py-3 rounded-full font-medium transition-colors cursor-pointer"
                   style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}
                   onMouseOver={e => (e.currentTarget.style.backgroundColor = "#56785D")}
                   onMouseOut={e => (e.currentTarget.style.backgroundColor = "#3F5C45")}

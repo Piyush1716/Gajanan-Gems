@@ -54,6 +54,7 @@ function BulkOrderPage() {
             messageLabel="Requirement Details"
             messagePlaceholder="Tell us the products, quantities and any customization or packaging needs."
             submitLabel="Submit Bulk Order Request"
+            inquiryType="bulk-order"
           />
         </div>
       </div>

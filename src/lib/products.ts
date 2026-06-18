@@ -27,6 +27,7 @@ export type ProductRow = {
   created_at: string;
   category_id: number | null;
   available: boolean;
+  bestseller?: boolean;
   categories?: CategoryRow | null;
   // joined from product_images table
   product_images?: ProductImageRow[];
@@ -56,6 +57,7 @@ export type Product = ProductRow & {
   slug: string;
   name: string;
   img: string;           // full public URL for the primary product image
+  bestseller: boolean;
   old?: number;
   shortDescription?: string;
 
@@ -114,6 +116,7 @@ function normaliseProduct(row: ProductRow): Product {
     name:             title,
     slug:             titleToSlug(title),
     img:              primaryImg,
+    bestseller:       row.bestseller ?? false,
     old:              row.old_price ?? undefined,
     shortDescription: row.description  ?? undefined,
     categorySlug:     joined?.slug     ?? undefined,

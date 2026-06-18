@@ -1,0 +1,12 @@
+User-agent: *
+
+# Block transactional/private pages from being indexed
+Disallow: /checkout
+Disallow: /order-confirmation
+Disallow: /order-tracking
+Disallow: /cart
+
+# Allow all public pages
+Allow: /
+
+Sitemap: https://gajanangems.com/sitemap.xml

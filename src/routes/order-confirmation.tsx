@@ -3,26 +3,60 @@ import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CheckCircle2, Package, Mail, MessageCircle } from "lucide-react";
 import { z } from "zod";
+import { useEffect, useState } from "react";
 
 export const Route = createFileRoute("/order-confirmation")({
   validateSearch: z.object({
+    // Only the orderId remains in the URL — all other data comes from sessionStorage
     orderId: z.string().optional(),
-    firstName: z.string().optional(),
-    total: z.string().optional(),
-    payMethod: z.string().optional(),
   }),
   head: () => ({
     meta: [
       { title: "Order Confirmed — GajananGems" },
       { name: "description", content: "Your GajananGems order has been placed successfully." },
-      { name: "robots", content: "noindex" },
+      { name: "robots", content: "noindex, nofollow" },
     ],
   }),
   component: OrderConfirmationPage,
 });
 
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+interface ConfirmData {
+  orderId: number | string;
+  firstName?: string;
+  total?: number | string;
+  payMethod?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function OrderConfirmationPage() {
-  const { orderId, firstName, total, payMethod } = Route.useSearch();
+  const { orderId: urlOrderId } = Route.useSearch();
+  const [confirmData, setConfirmData] = useState<ConfirmData | null>(null);
+
+  useEffect(() => {
+    // Read confirmation data from sessionStorage (written by checkout.tsx)
+    try {
+      const raw = sessionStorage.getItem("gajanan_order_confirm");
+      if (raw) {
+        const parsed: ConfirmData = JSON.parse(raw);
+        setConfirmData(parsed);
+        // Clear after reading — it's a one-time use token
+        sessionStorage.removeItem("gajanan_order_confirm");
+      } else if (urlOrderId) {
+        // Fallback: use URL orderId if sessionStorage is unavailable
+        setConfirmData({ orderId: urlOrderId });
+      }
+    } catch {
+      if (urlOrderId) setConfirmData({ orderId: urlOrderId });
+    }
+  }, [urlOrderId]);
+
+  const orderId   = confirmData?.orderId ?? urlOrderId;
+  const firstName = confirmData?.firstName;
+  const total     = confirmData?.total;
+  const payMethod = confirmData?.payMethod;
 
   const payLabel =
     payMethod === "razorpay"
@@ -31,7 +65,7 @@ function OrderConfirmationPage() {
         ? payMethod
         : "Online Payment";
 
-  const displayAmount = total ? parseInt(total).toLocaleString() : "N/A";
+  const displayAmount = total ? parseInt(String(total)).toLocaleString() : "N/A";
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -91,7 +125,7 @@ function OrderConfirmationPage() {
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <Package className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Track your order</p>
-              <p className="text-xs text-muted-foreground">Use your Order ID & email to track anytime</p>
+              <p className="text-xs text-muted-foreground">Use your Order ID &amp; email to track anytime</p>
             </div>
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <MessageCircle className="h-6 w-6 text-primary" />
@@ -114,7 +148,7 @@ function OrderConfirmationPage() {
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-bold">3.</span>
-                <span>You'll receive shipping updates via WhatsApp & email</span>
+                <span>You'll receive shipping updates via WhatsApp &amp; email</span>
               </li>
               <li className="flex gap-2">
                 <span className="text-primary font-bold">4.</span>

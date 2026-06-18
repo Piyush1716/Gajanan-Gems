@@ -109,6 +109,7 @@ function CustomBraceletPage() {
             messageLabel="Your Requirements"
             messagePlaceholder="Crystal name(s), bead size (6/8/10/12mm), wrist size, purpose and any design preference."
             submitLabel="Submit Requirement"
+            inquiryType="customized-bracelet"
           />
         </div>
 

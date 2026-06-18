@@ -3,7 +3,7 @@ import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 
 const faqs = [
-  { q: "Do you offer COD?", a: "Yes, we offer Cash on Delivery (COD)." },
+  { q: "Do you offer COD?", a: "Currently, we do not offer Cash on Delivery (COD). Please use our available online payment methods to complete your purchase." },
   {
     q: "How will I know that my order is successful?",
     a: "Once we get your order, you will receive an order confirmation email along with the timelines.",
@@ -18,7 +18,7 @@ const faqs = [
   },
   {
     q: "What is your delivery time?",
-    a: "Products in Mumbai are delivered in 2-3 working days, whereas products outside Mumbai are delivered in 4-6 working days.",
+    a: "Products in Gujarat are delivered in 2-3 working days, whereas products outside Gujarat are delivered in 4-6 working days.",
   },
   {
     q: "Whom should I talk to if I have a concern?",
@@ -27,13 +27,11 @@ const faqs = [
 ];
 
 const cancellationSteps = [
-  "Login to your account on the GajananGems website.",
-  'Go to your "Account" tab and click on the "Order" option.',
-  'Look for the product order you want and click on the "Cancel request" option.',
-  'A form titled "Request Order Cancellation" will appear — enter the reason for your cancellation.',
-  'After filling the details, click on "Confirm Cancellation".',
-  "A request will then be sent to our team for cancelling your order.",
-  "Your request for order cancellation will be processed within 48 hours.",
+  "Currently, we do not offer self-service order cancellations.",
+  "If you wish to cancel your order, please contact our support team as soon as possible.",
+  "Our team will review your request and assist you if the order has not yet been processed or shipped.",
+  "If the order has already been dispatched, you may refuse to accept the package at the time of delivery.",
+  "For any assistance regarding cancellations, please get in touch with our customer support team.",
 ];
 
 export const Route = createFileRoute("/faq")({

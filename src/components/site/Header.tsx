@@ -8,10 +8,10 @@ import { normaliseProductForSearch, type SearchResult } from "@/lib/search";
 
 const nav = [
   { label: "Shop", to: "/" },
-  { label: "Palm Analysis", to: "/hand-analysis" }
-  // { label: "Custom Bracelet", to: "/customized-bracelet" },
+  { label: "Palm Analysis", to: "/hand-analysis" },
+  { label: "Track Order", to: "/order-tracking" },
   // { label: "Bulk Order", to: "/bulk-order" },
-  // { label: "About", to: "/about-us" },
+  { label: "About Us", to: "/about-us" }
   // { label: "FAQ", to: "/faq" },
   // { label: "Contact", to: "/contact-us" },
 ];
@@ -84,7 +84,7 @@ export function Header() {
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
       {/* Promo bar */}
       <div className="text-center text-xs sm:text-sm py-2 px-4" style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}>
-        Free Delivery on All Orders 🚚 · Use <strong>FIRST50</strong> for ₹50 off your first order
+        Free Delivery on All Orders 🚚 · Great Prices, Delivered Free
       </div>
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 flex items-center gap-4 h-16 lg:h-20">
