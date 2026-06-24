@@ -14,6 +14,7 @@ import { Route as TermsConditionsRouteImport } from './routes/terms-conditions'
 import { Route as ShippingPolicyRouteImport } from './routes/shipping-policy'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as ReturnsRefundPolicyRouteImport } from './routes/returns-refund-policy'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as OrderTrackingRouteImport } from './routes/order-tracking'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
@@ -52,6 +53,11 @@ const SearchRoute = SearchRouteImport.update({
 const ReturnsRefundPolicyRoute = ReturnsRefundPolicyRouteImport.update({
   id: '/returns-refund-policy',
   path: '/returns-refund-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/profile': typeof ProfileRoute
   '/returns-refund-policy': typeof ReturnsRefundPolicyRoute
   '/search': typeof SearchRoute
   '/shipping-policy': typeof ShippingPolicyRoute
@@ -159,6 +166,7 @@ export interface FileRoutesByTo {
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/profile': typeof ProfileRoute
   '/returns-refund-policy': typeof ReturnsRefundPolicyRoute
   '/search': typeof SearchRoute
   '/shipping-policy': typeof ShippingPolicyRoute
@@ -181,6 +189,7 @@ export interface FileRoutesById {
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
+  '/profile': typeof ProfileRoute
   '/returns-refund-policy': typeof ReturnsRefundPolicyRoute
   '/search': typeof SearchRoute
   '/shipping-policy': typeof ShippingPolicyRoute
@@ -204,6 +213,7 @@ export interface FileRouteTypes {
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
+    | '/profile'
     | '/returns-refund-policy'
     | '/search'
     | '/shipping-policy'
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
+    | '/profile'
     | '/returns-refund-policy'
     | '/search'
     | '/shipping-policy'
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
+    | '/profile'
     | '/returns-refund-policy'
     | '/search'
     | '/shipping-policy'
@@ -268,6 +280,7 @@ export interface RootRouteChildren {
   OrderConfirmationRoute: typeof OrderConfirmationRoute
   OrderTrackingRoute: typeof OrderTrackingRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
+  ProfileRoute: typeof ProfileRoute
   ReturnsRefundPolicyRoute: typeof ReturnsRefundPolicyRoute
   SearchRoute: typeof SearchRoute
   ShippingPolicyRoute: typeof ShippingPolicyRoute
@@ -312,6 +325,13 @@ declare module '@tanstack/react-router' {
       path: '/returns-refund-policy'
       fullPath: '/returns-refund-policy'
       preLoaderRoute: typeof ReturnsRefundPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy-policy': {
@@ -428,6 +448,7 @@ const rootRouteChildren: RootRouteChildren = {
   OrderConfirmationRoute: OrderConfirmationRoute,
   OrderTrackingRoute: OrderTrackingRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,
+  ProfileRoute: ProfileRoute,
   ReturnsRefundPolicyRoute: ReturnsRefundPolicyRoute,
   SearchRoute: SearchRoute,
   ShippingPolicyRoute: ShippingPolicyRoute,

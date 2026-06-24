@@ -1,7 +1,8 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/lib/cart";
+import { useAuth } from "@/lib/auth";
 import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 
 export const Route = createFileRoute("/cart")({
@@ -16,6 +17,8 @@ export const Route = createFileRoute("/cart")({
 
 function CartPage() {
   const { items, setQty, remove, subtotal, count, getProduct } = useCart();
+  const { isLoggedIn, showLoginModal } = useAuth();
+  const navigate = useNavigate();
   const total = subtotal;
 
   return (
@@ -81,9 +84,18 @@ function CartPage() {
               <div className="border-t border-border pt-4 flex justify-between font-semibold text-lg">
                 <span>Total</span><span>₹{total.toLocaleString()}</span>
               </div>
-              <Link to="/checkout" className="block text-center bg-primary text-primary-foreground rounded-full py-3 text-sm font-medium hover:bg-primary/90">
-                Proceed to Checkout
-              </Link>
+              {isLoggedIn ? (
+                <Link to="/checkout" className="block text-center bg-primary text-primary-foreground rounded-full py-3 text-sm font-medium hover:bg-primary/90">
+                  Proceed to Checkout
+                </Link>
+              ) : (
+                <button
+                  onClick={() => showLoginModal(() => navigate({ to: "/checkout" }))}
+                  className="w-full text-center bg-primary text-primary-foreground rounded-full py-3 text-sm font-medium hover:bg-primary/90 transition-colors"
+                >
+                  Proceed to Checkout
+                </button>
+              )}
             </aside>
           </div>
         )}

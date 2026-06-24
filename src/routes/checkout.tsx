@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { useAuth } from "@/lib/auth";
 import { ShieldCheck, Truck, CreditCard, Lock, AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/checkout")({
@@ -190,11 +191,38 @@ function CheckoutPage() {
     register,
     handleSubmit,
     getValues,
+    setValue,
     formState: { errors },
   } = useForm<BillingFormData>({
     resolver: zodResolver(schema),
     defaultValues: { country: "India" },
   });
+
+  // ── Auth: auto-fill email & phone from logged-in user ──────────────────────
+  const { user, isLoggedIn, showLoginModal } = useAuth();
+
+  // Auto-fill email and phone when user data is available
+  useEffect(() => {
+    if (user?.email) {
+      setValue("email", user.email, { shouldValidate: false });
+    }
+    if (user?.phone) {
+      setValue("phone", user.phone, { shouldValidate: false });
+    }
+    if (user?.first_name) {
+      setValue("firstName", user.first_name, { shouldValidate: false });
+    }
+    if (user?.last_name) {
+      setValue("lastName", user.last_name, { shouldValidate: false });
+    }
+  }, [user, setValue]);
+
+  // Show login modal if not logged in
+  useEffect(() => {
+    if (!isLoggedIn) {
+      showLoginModal();
+    }
+  }, [isLoggedIn, showLoginModal]);
 
   // ── Handle payment success ──────────────────────────────────────────────────
 

@@ -1,10 +1,13 @@
 import { useCart } from "@/lib/cart";
-import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
+import { Link, useNavigate } from "@tanstack/react-router";
 import { Minus, Plus, Trash2, ShoppingBag, X, ArrowRight } from "lucide-react";
 import { useEffect } from "react";
 
 export function CartSidebar() {
   const { items, setQty, remove, subtotal, count, getProduct, sidebarOpen, closeSidebar } = useCart();
+  const { isLoggedIn, showLoginModal } = useAuth();
+  const navigate = useNavigate();
 
   // Close sidebar on Escape key
   useEffect(() => {
@@ -175,14 +178,27 @@ export function CartSidebar() {
             </div>
 
             {/* Checkout button */}
-            <Link
-              to="/checkout"
-              onClick={closeSidebar}
-              className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium hover:bg-primary/90 transition"
-            >
-              Checkout
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            {isLoggedIn ? (
+              <Link
+                to="/checkout"
+                onClick={closeSidebar}
+                className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium hover:bg-primary/90 transition"
+              >
+                Checkout
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            ) : (
+              <button
+                onClick={() => {
+                  closeSidebar();
+                  showLoginModal(() => navigate({ to: "/checkout" }));
+                }}
+                className="flex items-center justify-center gap-2 w-full bg-primary text-primary-foreground rounded-lg py-3 font-medium hover:bg-primary/90 transition"
+              >
+                Checkout
+                <ArrowRight className="h-4 w-4" />
+              </button>
+            )}
 
             {/* Continue shopping button */}
             <button

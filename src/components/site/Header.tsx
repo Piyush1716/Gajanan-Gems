@@ -3,6 +3,7 @@ import { Search, ShoppingBag, Menu, Heart, X } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
+import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import { normaliseProductForSearch, type SearchResult } from "@/lib/search";
 
@@ -27,6 +28,7 @@ export function Header() {
   const navigate = useNavigate();
   const { count } = useCart();
   const { count: wishlistCount } = useWishlist();
+  const { user, isLoggedIn, showLoginModal } = useAuth();
 
   // Debounced Supabase search
   useEffect(() => {
@@ -197,12 +199,31 @@ export function Header() {
             )}
           </Link>
 
-          {/* Order tracking (User icon) */}
-          <Link to="/order-tracking" className="p-2 hidden sm:block" aria-label="Track order">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </Link>
+          {/* User account */}
+          {isLoggedIn ? (
+            <Link
+              to="/profile"
+              className="p-1 hidden sm:flex items-center gap-1.5"
+              aria-label="My Account"
+            >
+              <span
+                className="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold"
+                style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}
+              >
+                {(user?.first_name?.[0] || user?.email?.[0] || "U").toUpperCase()}
+              </span>
+            </Link>
+          ) : (
+            <button
+              onClick={() => showLoginModal()}
+              className="p-2 hidden sm:block"
+              aria-label="Log in"
+            >
+              <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </button>
+          )}
 
           {/* Cart */}
           <Link to="/cart" className="relative p-2" aria-label="Shopping cart">

@@ -8,7 +8,9 @@ import {
 } from "@tanstack/react-router";
 
 import { CartSidebar } from "@/components/site/CartSidebar";
+import { LoginModal } from "@/components/site/LoginModal";
 import { CartProvider } from "@/lib/cart";
+import { AuthProvider } from "@/lib/auth";
 import { WishlistProvider } from "@/lib/wishlist";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -82,10 +84,13 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <WishlistProvider>
         <CartProvider>
-          <Outlet />
-          <CartSidebar />
-          <AiChat />
-          <Toaster position="bottom-left" richColors />
+          <AuthProvider>
+            <Outlet />
+            <CartSidebar />
+            <LoginModal />
+            <AiChat />
+            <Toaster position="bottom-left" richColors />
+          </AuthProvider>
         </CartProvider>
       </WishlistProvider>
     </QueryClientProvider>
