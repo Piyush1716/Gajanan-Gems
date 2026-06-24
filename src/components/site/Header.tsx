@@ -187,7 +187,7 @@ export function Header() {
           </Link>
 
           {/* Wishlist */}
-          <Link to="/wishlist" className="relative p-2" aria-label="Wishlist">
+          <Link to="/wishlist" className="relative p-2 hidden sm:block" aria-label="Wishlist">
             <Heart className="h-5 w-5" />
             {wishlistCount > 0 && (
               <span
@@ -203,7 +203,7 @@ export function Header() {
           {isLoggedIn ? (
             <Link
               to="/profile"
-              className="p-1 hidden sm:flex items-center gap-1.5"
+              className="p-1 flex items-center gap-1.5"
               aria-label="My Account"
             >
               <span
@@ -216,7 +216,7 @@ export function Header() {
           ) : (
             <button
               onClick={() => showLoginModal()}
-              className="p-2 hidden sm:block"
+              className="p-2 block"
               aria-label="Log in"
             >
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
