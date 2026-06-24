@@ -212,7 +212,7 @@ function ProfilePage() {
           .select(
             "id, status, created_at, first_name, last_name, email, subtotal, shipping, total, payment_method, payment_error, order_items(id, title, qty, price, size)"
           )
-          .eq("email", user.email)
+          .eq("user_id", user.id)
           .order("created_at", { ascending: false });
 
         setOrders((data as unknown as Order[]) ?? []);

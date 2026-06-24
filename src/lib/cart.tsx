@@ -26,18 +26,17 @@ const Ctx = createContext<CartCtx | null>(null);
 const KEY = "shubh_cart_v1";
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    try {
+      const raw = typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
+      if (raw) return JSON.parse(raw);
+    } catch {}
+    return [];
+  });
+  
   const [productCache, setProductCache] = useState<Product[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [removedItems, setRemovedItems] = useState<Array<{ name: string; reason: string }>>([]);
-
-  // Hydrate cart from localStorage on mount
-  useEffect(() => {
-    try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem(KEY) : null;
-      if (raw) setItems(JSON.parse(raw));
-    } catch {}
-  }, []);
 
   // Persist cart to localStorage whenever it changes
   useEffect(() => {

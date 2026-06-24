@@ -220,9 +220,9 @@ function CheckoutPage() {
   // Show login modal if not logged in
   useEffect(() => {
     if (!isLoggedIn) {
-      showLoginModal();
+      showLoginModal(() => navigate({ to: "/checkout" }));
     }
-  }, [isLoggedIn, showLoginModal]);
+  }, [isLoggedIn, showLoginModal, navigate]);
 
   // ── Handle payment success ──────────────────────────────────────────────────
 
@@ -301,7 +301,6 @@ function CheckoutPage() {
         }
       }).catch(err => console.error("[checkout] Email send failed:", err));
 
-      clear();
       toast.success("Payment successful! Your order is confirmed.");
       // Store confirmation data in sessionStorage instead of URL query params
       // Prevents leakage via browser history, server logs, and referrer headers
@@ -466,6 +465,7 @@ function CheckoutPage() {
         .from("orders")
         .insert([
           {
+            user_id: user?.id || null,
             first_name: billing.firstName,
             last_name: billing.lastName,
             email: billing.email.toLowerCase(),
@@ -582,6 +582,37 @@ function CheckoutPage() {
 
   const inputCls =
     "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors";
+
+  // ── Auth gate ─────────────────────────────────────────────────────────────
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col">
+        <Header />
+        <main className="flex-1 flex items-center justify-center px-4 py-16">
+          <div className="max-w-md w-full text-center">
+            <div
+              className="mx-auto h-20 w-20 rounded-full flex items-center justify-center mb-6 shadow-lg"
+              style={{ backgroundColor: "#3F5C45" }}
+            >
+              <Lock className="h-10 w-10 text-white" />
+            </div>
+            <h1 className="text-2xl font-semibold mb-2">Sign in to checkout</h1>
+            <p className="text-muted-foreground text-sm mb-8">
+              Please log in to your account to complete your purchase securely.
+            </p>
+            <button
+              onClick={() => showLoginModal(() => navigate({ to: "/checkout" }))}
+              className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full px-8 py-3 text-sm font-semibold hover:bg-primary/90 transition-colors"
+            >
+              Log In
+            </button>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">

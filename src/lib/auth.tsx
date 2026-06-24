@@ -30,25 +30,26 @@ const STORAGE_KEY = "gajanangems_user_v1";
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [onSuccessCallback, setOnSuccessCallback] = useState<(() => void) | null>(null);
-
-  // Hydrate user from localStorage on mount
-  useEffect(() => {
+  const [user, setUser] = useState<User | null>(() => {
     try {
       const raw = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
       if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed?.id && parsed?.email) {
-          setUser(parsed);
+          return parsed;
         }
       }
     } catch {
       // Invalid data — clear it
-      localStorage.removeItem(STORAGE_KEY);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
-  }, []);
+    return null;
+  });
+  
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [onSuccessCallback, setOnSuccessCallback] = useState<(() => void) | null>(null);
 
   // Persist user to localStorage whenever it changes
   useEffect(() => {
