@@ -50,7 +50,8 @@ export type CategoryRow = {
   slug: string;
   image_url: string | null;
   created_at: string;
-  available?: boolean;  // NEW: Track category availability
+  available?: boolean;  // Track category availability
+  home?: boolean;       // Track if category shows on home page
 };
 
 export type Product = ProductRow & {
@@ -78,7 +79,8 @@ export type Category = {
   slug: string;
   name: string;
   img: string;
-  available: boolean;    // NEW: Track category availability
+  available: boolean;    // Track category availability
+  home: boolean;         // Track if category shows on home page
   description?: string;
 };
 
@@ -131,7 +133,8 @@ function normaliseCategory(row: CategoryRow): Category {
     slug:        row.slug,
     name:        row.name,
     img:         categoryImageUrl(row.image_url),
-    available:   row.available ?? true,  // NEW: Default to true for backward compatibility
+    available:   row.available ?? true,  // Default to true for backward compatibility
+    home:        row.home ?? true,       // Default to true for backward compatibility
     description: undefined,
   };
 }
@@ -140,13 +143,27 @@ function normaliseCategory(row: CategoryRow): Category {
 
 /**
  * Fetch all available categories
- * NEW: Filters by available = true
  */
 export async function fetchCategories(): Promise<Category[]> {
   const { data, error } = await supabase
     .from("categories")
     .select("*")
-    .eq("available", true)  // NEW: Only fetch available categories
+    .eq("available", true)
+    .order("name", { ascending: true });
+
+  if (error) throw new Error(error.message);
+  return (data ?? []).map(normaliseCategory);
+}
+
+/**
+ * Fetch categories specifically marked for the home page
+ */
+export async function fetchHomeCategories(): Promise<Category[]> {
+  const { data, error } = await supabase
+    .from("categories")
+    .select("*")
+    .eq("available", true)
+    .eq("home", true)
     .order("name", { ascending: true });
 
   if (error) throw new Error(error.message);

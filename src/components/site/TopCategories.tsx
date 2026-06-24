@@ -1,13 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { fetchCategories, type Category } from "@/lib/products";
+import { fetchHomeCategories, type Category } from "@/lib/products";
 
 export function TopCategories() {
   const [cats, setCats] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchCategories()
+    fetchHomeCategories()
       .then(setCats)
       .catch(console.error)
       .finally(() => setLoading(false));
@@ -60,6 +60,15 @@ export function TopCategories() {
             ))}
           </div>
         )}
+
+        <div className="mt-10 sm:mt-12 text-center">
+          <Link
+            to="/categories"
+            className="inline-flex items-center justify-center gap-2 border border-border bg-card hover:bg-secondary text-sm font-medium px-6 py-3 rounded-full transition-colors"
+          >
+            View All Categories
+          </Link>
+        </div>
       </div>
     </section>
   );

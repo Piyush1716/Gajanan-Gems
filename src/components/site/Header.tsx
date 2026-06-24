@@ -11,10 +11,8 @@ const nav = [
   { label: "Shop", to: "/" },
   { label: "Palm Analysis", to: "/hand-analysis" },
   { label: "Track Order", to: "/order-tracking" },
-  // { label: "Bulk Order", to: "/bulk-order" },
-  { label: "About Us", to: "/about-us" }
-  // { label: "FAQ", to: "/faq" },
-  // { label: "Contact", to: "/contact-us" },
+  { label: "About Us", to: "/about-us" },
+  { label: "Categories", to: "/categories" }
 ];
 
 export function Header() {
