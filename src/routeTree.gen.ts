@@ -18,6 +18,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as OrderTrackingRouteImport } from './routes/order-tracking'
 import { Route as OrderConfirmationRouteImport } from './routes/order-confirmation'
+import { Route as OffersRouteImport } from './routes/offers'
 import { Route as HandAnalysisRouteImport } from './routes/hand-analysis'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as CustomizedBraceletRouteImport } from './routes/customized-bracelet'
@@ -74,6 +75,11 @@ const OrderTrackingRoute = OrderTrackingRouteImport.update({
 const OrderConfirmationRoute = OrderConfirmationRouteImport.update({
   id: '/order-confirmation',
   path: '/order-confirmation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OffersRoute = OffersRouteImport.update({
+  id: '/offers',
+  path: '/offers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HandAnalysisRoute = HandAnalysisRouteImport.update({
@@ -148,6 +154,7 @@ export interface FileRoutesByFullPath {
   '/customized-bracelet': typeof CustomizedBraceletRoute
   '/faq': typeof FaqRoute
   '/hand-analysis': typeof HandAnalysisRoute
+  '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -171,6 +178,7 @@ export interface FileRoutesByTo {
   '/customized-bracelet': typeof CustomizedBraceletRoute
   '/faq': typeof FaqRoute
   '/hand-analysis': typeof HandAnalysisRoute
+  '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -195,6 +203,7 @@ export interface FileRoutesById {
   '/customized-bracelet': typeof CustomizedBraceletRoute
   '/faq': typeof FaqRoute
   '/hand-analysis': typeof HandAnalysisRoute
+  '/offers': typeof OffersRoute
   '/order-confirmation': typeof OrderConfirmationRoute
   '/order-tracking': typeof OrderTrackingRoute
   '/privacy-policy': typeof PrivacyPolicyRoute
@@ -220,6 +229,7 @@ export interface FileRouteTypes {
     | '/customized-bracelet'
     | '/faq'
     | '/hand-analysis'
+    | '/offers'
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
@@ -243,6 +253,7 @@ export interface FileRouteTypes {
     | '/customized-bracelet'
     | '/faq'
     | '/hand-analysis'
+    | '/offers'
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
@@ -266,6 +277,7 @@ export interface FileRouteTypes {
     | '/customized-bracelet'
     | '/faq'
     | '/hand-analysis'
+    | '/offers'
     | '/order-confirmation'
     | '/order-tracking'
     | '/privacy-policy'
@@ -290,6 +302,7 @@ export interface RootRouteChildren {
   CustomizedBraceletRoute: typeof CustomizedBraceletRoute
   FaqRoute: typeof FaqRoute
   HandAnalysisRoute: typeof HandAnalysisRoute
+  OffersRoute: typeof OffersRoute
   OrderConfirmationRoute: typeof OrderConfirmationRoute
   OrderTrackingRoute: typeof OrderTrackingRoute
   PrivacyPolicyRoute: typeof PrivacyPolicyRoute
@@ -366,6 +379,13 @@ declare module '@tanstack/react-router' {
       path: '/order-confirmation'
       fullPath: '/order-confirmation'
       preLoaderRoute: typeof OrderConfirmationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/offers': {
+      id: '/offers'
+      path: '/offers'
+      fullPath: '/offers'
+      preLoaderRoute: typeof OffersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/hand-analysis': {
@@ -466,6 +486,7 @@ const rootRouteChildren: RootRouteChildren = {
   CustomizedBraceletRoute: CustomizedBraceletRoute,
   FaqRoute: FaqRoute,
   HandAnalysisRoute: HandAnalysisRoute,
+  OffersRoute: OffersRoute,
   OrderConfirmationRoute: OrderConfirmationRoute,
   OrderTrackingRoute: OrderTrackingRoute,
   PrivacyPolicyRoute: PrivacyPolicyRoute,

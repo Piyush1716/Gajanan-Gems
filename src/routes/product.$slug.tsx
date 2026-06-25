@@ -1,11 +1,13 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
-import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft, ShoppingBag, ArrowRight } from "lucide-react";
+import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft, ShoppingBag, ArrowRight, Eye, Package, AlertTriangle, Gift } from "lucide-react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { fetchProductBySlug, fetchProducts, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
+import { ProductBadge } from "@/components/site/ProductBadge";
+import { getSocialProof, QTY_DISCOUNTS, FREE_GIFTS } from "@/lib/offers";
 
 export const Route = createFileRoute("/product/$slug")({
   head: ({ loaderData }) => {
@@ -168,7 +170,7 @@ function ProductPage() {
   const [size, setSize] = useState<string | undefined>(product.sizes?.[2]);
   const [qty, setQty] = useState(1);
   const [tab, setTab] = useState<"desc" | "info" | "reviews">("desc");
-  const { add } = useCart();
+  const { add, subtotal } = useCart();
   const { toggle: wishlistToggle, has: wishlistHas } = useWishlist();
   const navigate = useNavigate();
   const isWishlisted = wishlistHas(product.slug);
@@ -192,16 +194,20 @@ function ProductPage() {
           {/* Right: Details */}
           <div className="flex flex-col justify-between">
             <div>
-              {product.categoryName && (
-                <Link to="/category/$slug" params={{ slug: product.categorySlug! }} className="text-xs uppercase tracking-wider text-primary font-semibold hover:underline">
-                  {product.categoryName}
-                </Link>
-              )}
+              {/* Category + badge row */}
+              <div className="flex items-center gap-3 flex-wrap">
+                {product.categoryName && (
+                  <Link to="/category/$slug" params={{ slug: product.categorySlug! }} className="text-xs uppercase tracking-wider text-primary font-semibold hover:underline">
+                    {product.categoryName}
+                  </Link>
+                )}
+                <ProductBadge product={product} variant="page" />
+              </div>
               <h1 className="text-3xl lg:text-4xl font-semibold mt-2 mb-4">{product.name}</h1>
 
               {/* Rating */}
               {product.rating !== undefined && (
-                <div className="flex items-center gap-2 mb-4">
+                <div className="flex items-center gap-2 mb-3">
                   <div className="flex">
                     {[1, 2, 3, 4, 5].map((s) => (
                       <Star key={s} className={`h-4 w-4 ${s <= Math.round(product.rating ?? 0) ? "fill-yellow-400 text-yellow-400" : "text-muted-foreground"}`} />
@@ -212,6 +218,27 @@ function ProductPage() {
                   </span>
                 </div>
               )}
+
+              {/* Social proof */}
+              {(() => {
+                const proof = getSocialProof(product.id);
+                return (
+                  <div className="flex flex-wrap items-center gap-3 mb-4">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Eye className="h-3.5 w-3.5" />
+                      {proof.viewed} people viewed today
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Package className="h-3.5 w-3.5" />
+                      {proof.sold} sold this week
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 text-xs font-semibold" style={{ color: "#DC2626" }}>
+                      <AlertTriangle className="h-3.5 w-3.5" />
+                      Only {proof.left} left
+                    </span>
+                  </div>
+                );
+              })()}
 
               {/* Price */}
               <div className="flex items-center gap-3 mb-6">
@@ -245,6 +272,26 @@ function ProductPage() {
                       >
                         {s}
                       </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Quantity discount info table — bracelets only, informational */}
+              {product.categoryName?.toLowerCase().includes("bracelet") && (
+                <div className="mb-6 rounded-xl overflow-hidden border border-border">
+                  <div className="px-4 py-2.5 flex items-center gap-2" style={{ backgroundColor: "#3F5C45" }}>
+                    <span className="text-xs font-semibold uppercase tracking-wider text-white">📿 Bracelet Quantity Discount</span>
+                    <span className="text-[10px] text-white/70">(mention in order notes)</span>
+                  </div>
+                  <div className="grid grid-cols-4 divide-x divide-border text-center text-xs">
+                    {QTY_DISCOUNTS.map((row) => (
+                      <div key={row.qty} className="py-2.5 px-1">
+                        <div className="font-semibold text-sm mb-0.5">{row.qty}</div>
+                        <div className={row.discount ? "font-bold" : "text-muted-foreground"} style={row.discount ? { color: "#3F5C45" } : {}}>
+                          {row.note}
+                        </div>
+                      </div>
                     ))}
                   </div>
                 </div>
@@ -289,10 +336,34 @@ function ProductPage() {
                 </button>
               </div>
 
-              <div className="bg-secondary/50 rounded-xl p-4 text-sm space-y-2 mb-6">
+              <div className="bg-secondary/50 rounded-xl p-4 text-sm space-y-2 mb-4">
                 <p className="font-medium">Want a perfect fit?</p>
                 <p className="text-muted-foreground">Mention your wrist size in the order notes 💖. For sizes larger than 7 inches a small charge is added; smaller sizes ship with the extra beads.</p>
               </div>
+
+              {/* Free gift progress hint */}
+              {(() => {
+                const nextGift = FREE_GIFTS.find((g) => subtotal < g.above);
+                if (!nextGift) return null;
+                const need = nextGift.above - subtotal;
+                const pct = Math.min(100, (subtotal / nextGift.above) * 100);
+                return (
+                  <div className="rounded-xl p-3.5 mb-4 border" style={{ borderColor: "#C8A96B", backgroundColor: "#FFFBF0" }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Gift className="h-4 w-4 flex-shrink-0" style={{ color: "#C8A96B" }} />
+                      <span className="text-xs font-medium" style={{ color: "#92400E" }}>
+                        Add <strong>₹{need.toLocaleString()}</strong> more → {nextGift.icon} {nextGift.gift} FREE!
+                      </span>
+                    </div>
+                    <div className="h-1.5 rounded-full overflow-hidden" style={{ backgroundColor: "#FDE68A" }}>
+                      <div
+                        className="h-full rounded-full transition-all"
+                        style={{ width: `${pct}%`, backgroundColor: "#C8A96B" }}
+                      />
+                    </div>
+                  </div>
+                );
+              })()}
 
               <div className="grid grid-cols-3 gap-3 text-center text-xs">
                 <div className="p-3 border border-border rounded-lg">

@@ -12,8 +12,10 @@ const nav = [
   { label: "Palm Analysis", to: "/hand-analysis" },
   { label: "Track Order", to: "/order-tracking" },
   { label: "About Us", to: "/about-us" },
-  { label: "Categories", to: "/categories" }
+  { label: "Categories", to: "/categories" },
 ];
+
+const OFFERS_LINK = { label: "Offers", to: "/offers" };
 
 export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,6 +109,18 @@ export function Header() {
               {n.label}
             </Link>
           ))}
+          {/* Offers — highlighted */}
+          <Link
+            to={OFFERS_LINK.to}
+            className="flex items-center gap-1.5 whitespace-nowrap font-semibold transition-colors hover:opacity-80"
+            style={{ color: "#DC2626" }}
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ backgroundColor: "#DC2626" }} />
+              <span className="relative inline-flex rounded-full h-2 w-2" style={{ backgroundColor: "#DC2626" }} />
+            </span>
+            🔥 {OFFERS_LINK.label}
+          </Link>
         </nav>
 
         {/* Right side */}
@@ -261,6 +275,15 @@ export function Header() {
               {n.label}
             </Link>
           ))}
+          {/* Offers — highlighted in mobile menu */}
+          <Link
+            to={OFFERS_LINK.to}
+            onClick={() => setMenuOpen(false)}
+            className="py-2.5 px-2 text-sm font-bold uppercase tracking-wide flex items-center gap-2"
+            style={{ color: "#DC2626" }}
+          >
+            🔥 {OFFERS_LINK.label}
+          </Link>
         </nav>
       )}
     </header>
