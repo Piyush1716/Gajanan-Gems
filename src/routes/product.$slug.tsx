@@ -17,7 +17,7 @@ export const Route = createFileRoute("/product/$slug")({
           name: "description",
           content: product?.shortDescription
             ? product.shortDescription.slice(0, 160)
-            : "Authentic healing crystals and gemstone jewellery from GajananGems.",
+            : "Shop premium authentic healing crystals, gemstone bracelets, and spiritual decor from GajananGems. Free delivery on all orders!",
         },
         { property: "og:title", content: product ? `${product.name} — GajananGems` : "GajananGems" },
         { property: "og:image", content: product?.img ?? "" },
