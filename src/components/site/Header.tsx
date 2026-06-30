@@ -83,8 +83,10 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 bg-background/95 backdrop-blur border-b border-border">
       {/* Promo bar */}
-      <div className="text-center text-xs sm:text-sm py-2 px-4" style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}>
-        Free Delivery on All Orders 🚚 · Great Prices, Delivered Free
+      <div className="overflow-hidden whitespace-nowrap text-xs sm:text-sm py-2" style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}>
+        <div className="animate-marquee inline-block">
+          Free Delivery on All Orders 🚚 · Great Prices, Delivered Free
+        </div>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 lg:px-6 flex items-center gap-4 h-16 lg:h-20">

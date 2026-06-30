@@ -184,7 +184,7 @@ function CategoryPage() {
                           <button
                             onClick={(e) => { e.preventDefault(); toggle(p.slug); }}
                             aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
-                            className={`absolute bottom-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-all hover:scale-110 ${wished ? "opacity-100" : ""}`}
+                            className={`absolute bottom-2 right-2 p-1.5 rounded-full bg-background/80 backdrop-blur-sm opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all hover:scale-110 ${wished ? "opacity-100 sm:opacity-100" : ""}`}
                           >
                             <Heart className={`h-4 w-4 transition-colors ${wished ? "fill-red-500 text-red-500" : "text-muted-foreground"}`} />
                           </button>
