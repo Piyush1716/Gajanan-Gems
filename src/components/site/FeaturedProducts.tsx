@@ -1,23 +1,17 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { fetchProducts, type Product } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
 import { ShoppingBag, Heart } from "lucide-react";
 
 export function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { data: products = [], isLoading: loading, error } = useQuery({
+    queryKey: ["products"],
+    queryFn: fetchProducts,
+  });
   const { add } = useCart();
   const { toggle, has } = useWishlist();
-
-  useEffect(() => {
-    fetchProducts()
-      .then(setProducts)
-      .catch((e) => setError(e.message))
-      .finally(() => setLoading(false));
-  }, []);
 
   return (
     <section className="bg-secondary/40 py-12 sm:py-16">
@@ -34,12 +28,15 @@ export function FeaturedProducts() {
 
         {loading && (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
-            {Array.from({ length: 8 }).map((_, i) => (
+            {Array.from({ length: 12 }).map((_, i) => (
               <div key={i} className="bg-card rounded-2xl overflow-hidden border border-border animate-pulse">
                 <div className="aspect-square bg-secondary" />
-                <div className="p-3 sm:p-4 space-y-2">
-                  <div className="h-4 bg-secondary rounded w-3/4" />
-                  <div className="h-4 bg-secondary rounded w-1/3" />
+                <div className="p-3 sm:p-4">
+                  <div className="h-10 bg-secondary rounded w-3/4 mb-2" />
+                  <div className="h-6 bg-secondary rounded w-1/3" />
+                </div>
+                <div className="px-3 sm:px-4 pb-3 sm:pb-4">
+                  <div className="w-full h-[34px] sm:h-[36px] bg-secondary rounded-full" />
                 </div>
               </div>
             ))}
@@ -48,7 +45,7 @@ export function FeaturedProducts() {
 
         {error && (
           <p className="text-destructive text-sm py-8 text-center">
-            Failed to load products: {error}
+            Failed to load products: {error instanceof Error ? error.message : "Unknown error"}
           </p>
         )}
 

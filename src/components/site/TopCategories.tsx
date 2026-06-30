@@ -1,17 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { fetchHomeCategories, type Category } from "@/lib/products";
 
 export function TopCategories() {
-  const [cats, setCats] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchHomeCategories()
-      .then(setCats)
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: cats = [], isLoading: loading } = useQuery({
+    queryKey: ["homeCategories"],
+    queryFn: fetchHomeCategories,
+  });
 
   return (
     <section className="py-12 sm:py-16">

@@ -10,7 +10,7 @@ import {
 } from "@/lib/products";
 import { useCart } from "@/lib/cart";
 import { useWishlist } from "@/lib/wishlist";
-import { ChevronRight, SlidersHorizontal, ShoppingBag, Heart } from "lucide-react";
+import { ChevronRight, SlidersHorizontal, ShoppingBag, Heart, X } from "lucide-react";
 import { useState } from "react";
 
 export const Route = createFileRoute("/category/$slug")({
@@ -51,7 +51,7 @@ function CategoryPage() {
     products: Product[];
   };
   const [sort, setSort] = useState("popularity");
-  const [open, setOpen] = useState(false);
+  const [categoryModalOpen, setCategoryModalOpen] = useState(false);
   const { add } = useCart();
   const { toggle, has } = useWishlist();
 
@@ -96,40 +96,15 @@ function CategoryPage() {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-12 grid grid-cols-1 lg:grid-cols-[240px_1fr] gap-8">
-          {/* Sidebar */}
-          <aside className={`${open ? "block" : "hidden"} lg:block`}>
-            <div className="border border-border rounded-2xl p-5 bg-card">
-              <h3 className="text-sm uppercase tracking-wider font-semibold mb-4">Categories</h3>
-              <ul className="space-y-2 text-sm">
-                {allCategories.map((c) => (
-                  <li key={c.slug}>
-                    <Link
-                      to="/category/$slug"
-                      params={{ slug: c.slug }}
-                      className={`flex items-center gap-3 hover:text-primary transition-colors ${
-                        c.slug === category.slug ? "text-primary font-medium" : ""
-                      }`}
-                    >
-                      {c.img && (
-                        <img src={c.img} alt={c.name} className="h-7 w-7 rounded object-cover" />
-                      )}
-                      <span>{c.name}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </aside>
-
+        <div className="max-w-7xl mx-auto px-4 lg:px-6 py-8 lg:py-12">
           {/* Product grid */}
           <div>
             <div className="flex items-center justify-between mb-6 gap-3 flex-wrap">
               <button
-                onClick={() => setOpen(!open)}
-                className="lg:hidden inline-flex items-center gap-2 text-sm border border-border rounded-full px-4 py-2"
+                onClick={() => setCategoryModalOpen(true)}
+                className="inline-flex items-center gap-2 text-sm border border-border rounded-full px-5 py-2.5 hover:bg-secondary transition-colors"
               >
-                <SlidersHorizontal className="h-4 w-4" /> Filters
+                <SlidersHorizontal className="h-4 w-4" /> Browse Categories
               </button>
               <p className="text-sm text-muted-foreground">
                 Showing <span className="text-foreground font-medium">{sorted.length}</span> products
@@ -213,6 +188,41 @@ function CategoryPage() {
             )}
           </div>
         </div>
+
+        {/* Categories Modal */}
+        {categoryModalOpen && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+            <div className="bg-card w-full max-w-md rounded-2xl shadow-xl border border-border overflow-hidden flex flex-col max-h-[80vh]">
+              <div className="p-4 border-b border-border flex items-center justify-between">
+                <h3 className="font-semibold text-lg">Select Category</h3>
+                <button onClick={() => setCategoryModalOpen(false)} className="p-2 hover:bg-secondary rounded-full transition-colors">
+                  <X className="h-5 w-5" />
+                </button>
+              </div>
+              <div className="overflow-y-auto p-4 flex-1">
+                <ul className="space-y-2">
+                  {allCategories.map((c) => (
+                    <li key={c.slug}>
+                      <Link
+                        to="/category/$slug"
+                        params={{ slug: c.slug }}
+                        onClick={() => setCategoryModalOpen(false)}
+                        className={`flex items-center gap-4 p-3 rounded-xl hover:bg-secondary transition-colors ${
+                          c.slug === category.slug ? "bg-secondary border-primary/20 border" : "border border-transparent"
+                        }`}
+                      >
+                        {c.img && (
+                          <img src={c.img} alt={c.name} className="h-10 w-10 rounded-lg object-cover" />
+                        )}
+                        <span className={c.slug === category.slug ? "font-semibold text-primary" : "font-medium"}>{c.name}</span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </div>
