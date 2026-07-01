@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { CheckCircle2, Package, Mail, MessageCircle } from "lucide-react";
@@ -81,7 +82,7 @@ function OrderConfirmationPage() {
           </div>
 
           <h1 className="text-3xl font-semibold mb-2">
-            {firstName ? `Thank you, ${firstName}! 🎉` : "Order Confirmed! 🎉"}
+            {firstName ? `Thank you, ${DOMPurify.sanitize(firstName)}! 🎉` : "Order Confirmed! 🎉"}
           </h1>
           <p className="text-muted-foreground mb-8">
             Your order has been placed successfully. We'll send a confirmation to your email shortly and get started on

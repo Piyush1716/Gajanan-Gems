@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { toast } from "sonner";
 import { supabase } from "./supabase";
+import DOMPurify from "dompurify";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -138,8 +139,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           email: data.email.trim().toLowerCase(),
           phone: data.phone.trim(),
           password: data.password,
-          first_name: data.firstName?.trim() || null,
-          last_name: data.lastName?.trim() || null,
+          first_name: data.firstName ? DOMPurify.sanitize(data.firstName.trim()) : null,
+          last_name: data.lastName ? DOMPurify.sanitize(data.lastName.trim()) : null,
         })
         .select("id, email, phone, first_name, last_name")
         .single();

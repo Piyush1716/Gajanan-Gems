@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/lib/auth";
@@ -283,7 +284,8 @@ function ProfilePage() {
   // ── User initials ───────────────────────────────────────────────────────
 
   const initial = (user.first_name?.[0] ?? user.email[0] ?? "U").toUpperCase();
-  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Customer";
+  const rawFullName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Customer";
+  const fullName = DOMPurify.sanitize(rawFullName);
 
   // ── Main layout ─────────────────────────────────────────────────────────
 
@@ -453,7 +455,7 @@ function ProfilePage() {
                           </div>
                           {order.payment_error && (
                             <p className="text-xs text-red-700 mt-2 pl-6.5">
-                              Error: {order.payment_error}
+                              Error: {DOMPurify.sanitize(order.payment_error)}
                             </p>
                           )}
                         </div>
@@ -552,7 +554,7 @@ function ProfilePage() {
                                 >
                                   <div className="min-w-0 flex-1">
                                     <p className="font-medium text-sm line-clamp-1">
-                                      {item.title}
+                                      {DOMPurify.sanitize(item.title)}
                                     </p>
                                     <p className="text-xs text-muted-foreground">
                                       Qty {item.qty}

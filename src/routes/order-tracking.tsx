@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
+import DOMPurify from "dompurify";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 import { supabase } from "@/lib/supabase";
@@ -294,7 +295,7 @@ function OrderTrackingPage() {
               {/* Show payment error if exists */}
               {order.payment_error && (
                 <div className="mt-3 p-3 rounded-lg bg-black/10 text-sm text-foreground">
-                  <p className="font-medium text-red-700">Error: {order.payment_error}</p>
+                  <p className="font-medium text-red-700">Error: {DOMPurify.sanitize(order.payment_error)}</p>
                 </div>
               )}
               
@@ -395,7 +396,7 @@ function OrderTrackingPage() {
                   {order.order_items.map((item) => (
                     <li key={item.id} className="flex items-center justify-between px-5 py-3 text-sm">
                       <div>
-                        <p className="font-medium line-clamp-1">{item.title}</p>
+                        <p className="font-medium line-clamp-1">{DOMPurify.sanitize(item.title)}</p>
                         <p className="text-xs text-muted-foreground">
                           Qty {item.qty}{item.size ? ` · Size ${item.size}` : ""}
                         </p>

@@ -10,6 +10,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { ShieldCheck, Truck, CreditCard, Lock, AlertCircle } from "lucide-react";
+import DOMPurify from "dompurify";
 
 export const Route = createFileRoute("/checkout")({
   validateSearch: z.object({
@@ -210,10 +211,10 @@ function CheckoutPage() {
       setValue("phone", user.phone, { shouldValidate: false });
     }
     if (user?.first_name) {
-      setValue("firstName", user.first_name, { shouldValidate: false });
+      setValue("firstName", DOMPurify.sanitize(user.first_name), { shouldValidate: false });
     }
     if (user?.last_name) {
-      setValue("lastName", user.last_name, { shouldValidate: false });
+      setValue("lastName", DOMPurify.sanitize(user.last_name), { shouldValidate: false });
     }
   }, [user, setValue]);
 
@@ -466,16 +467,16 @@ function CheckoutPage() {
         .insert([
           {
             user_id: user?.id || null,
-            first_name: billing.firstName,
-            last_name: billing.lastName,
+            first_name: DOMPurify.sanitize(billing.firstName),
+            last_name: DOMPurify.sanitize(billing.lastName),
             email: billing.email.toLowerCase(),
-            phone: billing.phone,
-            address: billing.address,
-            city: billing.city,
-            state: billing.state,
-            pin: billing.pin,
-            country: billing.country,
-            notes: billing.notes || null,
+            phone: DOMPurify.sanitize(billing.phone),
+            address: DOMPurify.sanitize(billing.address),
+            city: DOMPurify.sanitize(billing.city),
+            state: DOMPurify.sanitize(billing.state),
+            pin: DOMPurify.sanitize(billing.pin),
+            country: DOMPurify.sanitize(billing.country),
+            notes: billing.notes ? DOMPurify.sanitize(billing.notes) : null,
             subtotal,
             shipping: 0, // Free delivery
             total,
@@ -785,7 +786,7 @@ function CheckoutPage() {
                           className="h-14 w-14 rounded-lg object-cover flex-shrink-0 bg-secondary"
                         />
                         <div className="flex-1 min-w-0">
-                          <div className="font-medium line-clamp-1">{p.name}</div>
+                          <div className="font-medium line-clamp-1">{DOMPurify.sanitize(p.name)}</div>
                           <div className="text-xs text-muted-foreground">
                             Qty {it.qty}
                             {it.size ? ` · ${it.size}mm` : ""}
