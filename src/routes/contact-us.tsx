@@ -11,7 +11,7 @@ export const Route = createFileRoute("/contact-us")({
       {
         name: "description",
         content:
-          "Get in touch with GajananGems. Email hello@gajanangems.com, call +91 63515 63768, or visit us in Khambhat.",
+          "Get in touch with GajananGems. Email hello@gajanangems.com, call +91 95370 66979, or visit us in Khambhat.",
       },
       { property: "og:title", content: "Contact Us — GajananGems" },
       { property: "og:url", content: "/contact-us" },
@@ -23,7 +23,7 @@ export const Route = createFileRoute("/contact-us")({
 
 const details = [
   { icon: Mail, label: "Email", value: "hello@gajanangems.com", href: "mailto:hello@gajanangems.com" },
-  { icon: Phone, label: "Phone / WhatsApp", value: "+91 63515 63768", href: "tel:+916351563768" },
+  { icon: Phone, label: "Phone / WhatsApp", value: "+91 95370 66979", href: "tel:+919537066979" },
   { icon: MapPin, label: "Showroom", value: "Khambhat, Gujarat, India", href: "https://maps.app.goo.gl/KhdT6hYsLYSjpuXi8" },
 ];
 

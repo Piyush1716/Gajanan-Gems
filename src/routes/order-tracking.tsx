@@ -462,8 +462,8 @@ function OrderTrackingPage() {
                 hello@gajanangems.com
               </a>{" "}
               or WhatsApp{" "}
-              <a href="https://wa.me/916351563768" className="text-primary underline" target="_blank" rel="noopener noreferrer">
-                +91 63515 63768
+              <a href="https://wa.me/919537066979" className="text-primary underline" target="_blank" rel="noopener noreferrer">
+                +91 95370 66979
               </a>
             </p>
           </div>

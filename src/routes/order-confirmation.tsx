@@ -131,7 +131,7 @@ function OrderConfirmationPage() {
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <MessageCircle className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Need help?</p>
-              <p className="text-xs text-muted-foreground">WhatsApp +91 63515 63768</p>
+              <p className="text-xs text-muted-foreground">WhatsApp +91 95370 66979</p>
             </div>
           </div>
 
@@ -186,7 +186,7 @@ function OrderConfirmationPage() {
               </a>
               <span className="hidden sm:inline text-border">•</span>
               <a
-                href="https://wa.me/916351563768"
+                href="https://wa.me/919537066979"
                 className="text-primary hover:underline font-medium"
                 target="_blank"
                 rel="noopener noreferrer"

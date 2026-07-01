@@ -621,12 +621,12 @@ function ProfilePage() {
             </a>{" "}
             or WhatsApp{" "}
             <a
-              href="https://wa.me/916351563768"
+              href="https://wa.me/919537066979"
               className="text-primary underline"
               target="_blank"
               rel="noopener noreferrer"
             >
-              +91 63515 63768
+              +91 95370 66979
             </a>
           </p>
         </div>

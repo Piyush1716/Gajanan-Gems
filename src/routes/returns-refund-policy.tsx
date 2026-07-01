@@ -51,7 +51,7 @@ function ReturnsPage() {
         <p>
           Once we receive the returned items, our team will inspect them for eligibility. If the
           items meet our return criteria, we will process the refund via bank transfer only. Kindly
-          share your bank details by Email: hello@gajanangems.com or WhatsApp: 6351563768. If
+          share your bank details by Email: hello@gajanangems.com or WhatsApp: 9537066979. If
           you opt to replace or change any received item, please note that return courier charges of
           up to ₹150 will apply. Replacement or exchange will be facilitated upon receipt of the
           item at our office.
