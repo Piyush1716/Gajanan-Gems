@@ -4,6 +4,7 @@ import DOMPurify from "dompurify";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/lib/auth";
 import { Search, Package, CheckCircle2, Clock, Truck, XCircle, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 
 export const Route = createFileRoute("/order-tracking")({
@@ -176,6 +177,8 @@ function OrderTrackingPage() {
   const [order, setOrder] = useState<Order | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
+  
+  const { user, isLoggedIn, showLoginModal } = useAuth();
 
   const handleTrack = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -196,6 +199,7 @@ function OrderTrackingPage() {
         .select("id, status, created_at, first_name, last_name, subtotal, shipping, total, payment_method, payment_error, order_items(id, title, qty, price, size)")
         .eq("id", id)
         .eq("email", email.trim().toLowerCase())
+        .eq("user_id", user?.id)
         .single();
 
       if (dbError || !data) {
@@ -218,6 +222,32 @@ function OrderTrackingPage() {
 
   // Determine if this is an actionable status that needs special handling
   const isActionableStatus = order && statusCfg && statusCfg.actionable;
+
+  if (!isLoggedIn) {
+    return (
+      <StaticPageLayout>
+        <PageBanner title="Order Tracking" crumb="Order Tracking" />
+        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+          <div
+            className="mx-auto h-16 w-16 rounded-full flex items-center justify-center mb-6 shadow-md"
+            style={{ backgroundColor: "#3F5C45" }}
+          >
+            <Package className="h-8 w-8 text-white" />
+          </div>
+          <h2 className="text-2xl font-semibold mb-3">Track Your Order</h2>
+          <p className="text-muted-foreground mb-8 max-w-md mx-auto">
+            Please log in to your account to track your orders and view their current status.
+          </p>
+          <button
+            onClick={() => showLoginModal()}
+            className="inline-flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-full px-8 py-3 text-sm font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Log In
+          </button>
+        </div>
+      </StaticPageLayout>
+    );
+  }
 
   return (
     <StaticPageLayout>
