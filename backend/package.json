@@ -6,7 +6,7 @@
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon --watch src/index.js",
-    "start": "nodemon src/index.js"
+    "start": "node src/index.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.106.1",
