@@ -1,0 +1,22 @@
+{
+  "name": "gajanangems-backend",
+  "version": "1.0.0",
+  "description": "Express backend for GajananGems ecommerce",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "dev": "nodemon --watch src/index.js",
+    "start": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.106.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^7.5.0",
+    "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": ">=20.x"
+  }
+}

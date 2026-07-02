@@ -4,7 +4,7 @@ import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useAuth } from "@/lib/auth";
-import { supabase } from "@/lib/supabase";
+import { getOrdersByUser } from "@/services/api";
 import {
   User,
   Mail,
@@ -208,15 +208,16 @@ function ProfilePage() {
     const fetchOrders = async () => {
       setLoading(true);
       try {
-        const { data } = await supabase
-          .from("orders")
-          .select(
-            "id, status, created_at, first_name, last_name, email, subtotal, shipping, total, payment_method, payment_error, order_items(id, title, qty, price, size)"
-          )
-          .eq("user_id", user.id)
-          .order("created_at", { ascending: false });
+        console.log(`[profile] Fetching orders for user ${user.id}`);
+        const { data, error } = await getOrdersByUser(user.id);
 
-        setOrders((data as unknown as Order[]) ?? []);
+        if (error) {
+          console.error("[profile] Failed to fetch orders:", error);
+          setOrders([]);
+        } else {
+          console.log(`[profile] Loaded ${(data ?? []).length} orders`);
+          setOrders((data as unknown as Order[]) ?? []);
+        }
       } catch {
         setOrders([]);
       } finally {
@@ -283,8 +284,10 @@ function ProfilePage() {
 
   // ── User initials ───────────────────────────────────────────────────────
 
-  const initial = (user.first_name?.[0] ?? user.email[0] ?? "U").toUpperCase();
-  const rawFullName = [user.first_name, user.last_name].filter(Boolean).join(" ") || "Customer";
+  // user is guaranteed non-null here — the !isLoggedIn guard above returns early
+  const u = user!;
+  const initial = (u.first_name?.[0] ?? u.email[0] ?? "U").toUpperCase();
+  const rawFullName = [u.first_name, u.last_name].filter(Boolean).join(" ") || "Customer";
   const fullName = DOMPurify.sanitize(rawFullName);
 
   // ── Main layout ─────────────────────────────────────────────────────────
@@ -319,12 +322,12 @@ function ProfilePage() {
               <div className="mt-2 space-y-1">
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Mail className="h-3.5 w-3.5 flex-shrink-0" />
-                  <span className="truncate">{user.email}</span>
+                  <span className="truncate">{u.email}</span>
                 </div>
-                {user.phone && (
+                {u.phone && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Phone className="h-3.5 w-3.5 flex-shrink-0" />
-                    <span>{user.phone}</span>
+                    <span>{u.phone}</span>
                   </div>
                 )}
               </div>

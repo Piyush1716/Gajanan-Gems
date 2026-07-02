@@ -3,7 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
-import { supabase } from "@/lib/supabase";
+import { trackOrder } from "@/services/api";
 import { useAuth } from "@/lib/auth";
 import { Search, Package, CheckCircle2, Clock, Truck, XCircle, Loader2, AlertCircle, RotateCcw } from "lucide-react";
 
@@ -194,21 +194,17 @@ function OrderTrackingPage() {
     setSubmitted(true);
 
     try {
-      const { data, error: dbError } = await supabase
-        .from("orders")
-        .select("id, status, created_at, first_name, last_name, subtotal, shipping, total, payment_method, payment_error, order_items(id, title, qty, price, size)")
-        .eq("id", id)
-        .eq("email", email.trim().toLowerCase())
-        .eq("user_id", user?.id)
-        .single();
+      console.log(`[order-tracking] Tracking order id=${id}, email=${email.trim()}`);
+      const { data, error: trackError } = await trackOrder(id, email.trim().toLowerCase(), user?.id);
 
-      if (dbError || !data) {
+      if (trackError || !data) {
         setError(
           "We couldn't find an order matching those details. Please double-check your Order ID and email address."
         );
         return;
       }
 
+      console.log(`[order-tracking] Found order ${id} — status: ${data.status}`);
       setOrder(data as unknown as Order);
     } catch {
       setError("Something went wrong. Please try again or contact us at hello@gajanangems.com.");

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
 import { toast } from "sonner";
-import { supabase } from "./supabase";
 import DOMPurify from "dompurify";
+import { loginUser, signupUser } from "@/services/api";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,46 +68,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // ── Login ───────────────────────────────────────────────────────────────────
 
   const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    try {
-      const { data, error } = await supabase
-        .from("users")
-        .select("id, email, phone, first_name, last_name")
-        .eq("email", email.trim().toLowerCase())
-        .eq("password", password)
-        .single();
+    console.log(`[auth] Attempting login for: ${email}`);
+    const { data, error } = await loginUser(email.trim().toLowerCase(), password);
 
-      if (error || !data) {
-        toast.error("Invalid email or password. Please try again.");
-        return false;
-      }
-
-      const userData: User = {
-        id: data.id,
-        email: data.email,
-        phone: data.phone,
-        first_name: data.first_name,
-        last_name: data.last_name,
-      };
-
-      setUser(userData);
-      toast.success(`Welcome back${data.first_name ? `, ${data.first_name}` : ""}! 🎉`);
-
-      // Close modal and trigger callback
-      setLoginModalOpen(false);
-      if (onSuccessCallback) {
-        // Run callback after a short delay to let the modal close
-        setTimeout(() => {
-          onSuccessCallback();
-          setOnSuccessCallback(null);
-        }, 150);
-      }
-
-      return true;
-    } catch (err) {
-      console.error("[auth] Login error:", err);
-      toast.error("Something went wrong. Please try again.");
+    if (error || !data?.user) {
+      console.error("[auth] Login failed:", error);
+      toast.error(error || "Invalid email or password. Please try again.");
       return false;
     }
+
+    const userData: User = {
+      id: data.user.id,
+      email: data.user.email,
+      phone: data.user.phone,
+      first_name: data.user.first_name,
+      last_name: data.user.last_name,
+    };
+
+    setUser(userData);
+    console.log(`[auth] Login successful for: ${email}`);
+    toast.success(`Welcome back${data.user.first_name ? `, ${data.user.first_name}` : ""}! 🎉`);
+
+    // Close modal and trigger callback
+    setLoginModalOpen(false);
+    if (onSuccessCallback) {
+      // Run callback after a short delay to let the modal close
+      setTimeout(() => {
+        onSuccessCallback();
+        setOnSuccessCallback(null);
+      }, 150);
+    }
+
+    return true;
   }, [onSuccessCallback]);
 
   // ── Signup ──────────────────────────────────────────────────────────────────
@@ -119,64 +111,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     firstName?: string;
     lastName?: string;
   }): Promise<boolean> => {
-    try {
-      // Check if email already exists
-      const { data: existing } = await supabase
-        .from("users")
-        .select("id")
-        .eq("email", data.email.trim().toLowerCase())
-        .single();
+    console.log(`[auth] Attempting signup for: ${data.email}`);
 
-      if (existing) {
-        toast.error("An account with this email already exists. Please log in instead.");
-        return false;
-      }
+    const { data: resData, error } = await signupUser({
+      email: data.email.trim().toLowerCase(),
+      phone: data.phone.trim(),
+      password: data.password,
+      first_name: data.firstName ? DOMPurify.sanitize(data.firstName.trim()) : null,
+      last_name: data.lastName ? DOMPurify.sanitize(data.lastName.trim()) : null,
+    });
 
-      // Insert new user
-      const { data: newUser, error } = await supabase
-        .from("users")
-        .insert({
-          email: data.email.trim().toLowerCase(),
-          phone: data.phone.trim(),
-          password: data.password,
-          first_name: data.firstName ? DOMPurify.sanitize(data.firstName.trim()) : null,
-          last_name: data.lastName ? DOMPurify.sanitize(data.lastName.trim()) : null,
-        })
-        .select("id, email, phone, first_name, last_name")
-        .single();
-
-      if (error || !newUser) {
-        console.error("[auth] Signup error:", error);
-        toast.error(error?.message || "Failed to create account. Please try again.");
-        return false;
-      }
-
-      const userData: User = {
-        id: newUser.id,
-        email: newUser.email,
-        phone: newUser.phone,
-        first_name: newUser.first_name,
-        last_name: newUser.last_name,
-      };
-
-      setUser(userData);
-      toast.success(`Account created successfully! Welcome${newUser.first_name ? `, ${newUser.first_name}` : ""}! 🎉`);
-
-      // Close modal and trigger callback
-      setLoginModalOpen(false);
-      if (onSuccessCallback) {
-        setTimeout(() => {
-          onSuccessCallback();
-          setOnSuccessCallback(null);
-        }, 150);
-      }
-
-      return true;
-    } catch (err) {
-      console.error("[auth] Signup error:", err);
-      toast.error("Something went wrong. Please try again.");
+    if (error || !resData?.user) {
+      console.error("[auth] Signup failed:", error);
+      toast.error(error || "Failed to create account. Please try again.");
       return false;
     }
+
+    const newUser = resData.user;
+
+    const userData: User = {
+      id: newUser.id,
+      email: newUser.email,
+      phone: newUser.phone,
+      first_name: newUser.first_name,
+      last_name: newUser.last_name,
+    };
+
+    setUser(userData);
+    console.log(`[auth] Signup successful for: ${data.email}`);
+    toast.success(`Account created successfully! Welcome${newUser.first_name ? `, ${newUser.first_name}` : ""}! 🎉`);
+
+    // Close modal and trigger callback
+    setLoginModalOpen(false);
+    if (onSuccessCallback) {
+      setTimeout(() => {
+        onSuccessCallback();
+        setOnSuccessCallback(null);
+      }, 150);
+    }
+
+    return true;
   }, [onSuccessCallback]);
 
   // ── Logout ──────────────────────────────────────────────────────────────────

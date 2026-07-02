@@ -13,8 +13,8 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-      // Forward /api/* to the local dev API server (server.js)
-      // Run `node server.js` in a separate terminal before `npm run dev`
+      // Forward /api/* to the Express backend (backend/src/index.js on port 3001)
+      // Run `npm run dev:api` in a separate terminal before `npm run dev`
       "/api": {
         target: "http://localhost:3001",
         changeOrigin: true,

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "sonner";
+import { submitContact } from "@/services/api";
 
 type Field = { name: string; label: string; type?: string; required?: boolean };
 
@@ -47,25 +48,16 @@ export function ContactForm({
 
     // Check content-type to avoid crash if API isn't available in dev mode
     try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name:    payload["name"] ?? "",
-          email:   payload["email"] ?? "",
-          phone:   payload["phone"] ?? "",
-          message: payload["message"] ?? "",
-          inquiryType: inquiryType,
-        }),
+      const { data, error } = await submitContact({
+        name: payload["name"] ?? "",
+        email: payload["email"] ?? "",
+        phone: payload["phone"] ?? "",
+        message: payload["message"] ?? "",
+        inquiryType: inquiryType,
       });
 
-      const contentType = res.headers.get("content-type") ?? "";
-      const data = contentType.includes("application/json")
-        ? await res.json()
-        : { error: "Server error — please try again or email us directly." };
-
-      if (!res.ok) {
-        toast.error(data?.error ?? "Failed to send message. Please try again.");
+      if (error || !data?.success) {
+        toast.error(error ?? "Failed to send message. Please try again.");
         return;
       }
 
