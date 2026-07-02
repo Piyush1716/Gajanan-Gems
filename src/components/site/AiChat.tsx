@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Bot, User, Loader2, Trash2 } from "lucide-react";
 
@@ -48,7 +49,7 @@ export function AiChat() {
     if (!CHAT_API_URL) {
       setMessages((prev) => [
         ...prev,
-        { role: "bot", text: "⚠️ Chat service is not configured. Please contact us at hello@gajanangems.com." },
+        { role: "bot", text: `⚠️ Chat service is not configured. Please contact us at ${CONTACT_EMAIL}.` },
       ]);
       setLoading(false);
       return;

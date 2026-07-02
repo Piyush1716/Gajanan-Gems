@@ -2,7 +2,8 @@ import { useState, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, Gem } from "lucide-react";
+import { Eye, EyeOff, Loader2, Gem, AlertCircle } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   Dialog,
@@ -12,12 +13,38 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useAuth } from "@/lib/auth";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
 
+const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const indianPhoneRegex = /^[6-9]\d{9}$/;
+
+const sanitizeIdentifier = (val: string) => {
+  if (val.includes("@")) return val.trim();
+  let cleaned = val.replace(/[\s\-\(\)]/g, "");
+  if (cleaned.startsWith("+91")) {
+    cleaned = cleaned.substring(3);
+  } else if (cleaned.length === 12 && cleaned.startsWith("91")) {
+    cleaned = cleaned.substring(2);
+  } else if (cleaned.length === 11 && cleaned.startsWith("0")) {
+    cleaned = cleaned.substring(1);
+  }
+  return cleaned;
+};
+
 const loginSchema = z.object({
-  email: z.string().min(1, "Email is required").email("Enter a valid email address"),
+  identifier: z
+    .string()
+    .min(1, "Email or phone number is required")
+    .transform(sanitizeIdentifier)
+    .refine(
+      (val) => emailRegex.test(val) || indianPhoneRegex.test(val),
+      {
+        message: "Enter a valid email address or 10-digit Indian mobile number",
+      }
+    ),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -25,11 +52,12 @@ const signupSchema = z
   .object({
     firstName: z.string().optional(),
     lastName: z.string().optional(),
-    email: z.string().min(1, "Email is required").email("Enter a valid email address"),
+    email: z.string().min(1, "Email is required").regex(emailRegex, "Enter a valid email address"),
     phone: z
       .string()
       .min(1, "Phone number is required")
-      .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"),
+      .transform(sanitizeIdentifier)
+      .refine((val) => indianPhoneRegex.test(val), "Enter a valid 10-digit Indian mobile number"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string().min(1, "Please confirm your password"),
   })
@@ -55,12 +83,13 @@ export function LoginModal() {
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showResetMsg, setShowResetMsg] = useState(false);
 
   // ── Login Form ────────────────────────────────────────────────────────────
 
   const loginForm = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: { identifier: "", password: "" },
   });
 
   // ── Signup Form ───────────────────────────────────────────────────────────
@@ -85,12 +114,13 @@ export function LoginModal() {
     setShowLoginPassword(false);
     setShowSignupPassword(false);
     setShowConfirmPassword(false);
+    setShowResetMsg(false);
   }, [loginForm, signupForm]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
   const handleLogin = loginForm.handleSubmit(async (values) => {
-    await login(values.email, values.password);
+    await login(values.identifier, values.password);
   });
 
   const handleSignup = signupForm.handleSubmit(async (values) => {
@@ -162,31 +192,43 @@ export function LoginModal() {
             {/* ── Login Tab ──────────────────────────────────────────────── */}
             <TabsContent value="login" className="mt-5">
               <form onSubmit={handleLogin} className="space-y-4">
-                {/* Email */}
+                {/* Identifier */}
                 <div className="space-y-1.5">
-                  <label htmlFor="login-email" className="text-sm font-medium text-foreground">
-                    Email Address
+                  <label htmlFor="login-identifier" className="text-sm font-medium text-foreground">
+                    Email Address or Phone Number
                   </label>
                   <input
-                    id="login-email"
-                    type="email"
-                    placeholder="you@example.com"
-                    autoComplete="email"
+                    id="login-identifier"
+                    type="text"
+                    placeholder="you@example.com or 9876543210"
+                    autoComplete="username"
                     className={inputClasses}
-                    {...loginForm.register("email")}
+                    {...loginForm.register("identifier")}
                   />
-                  {loginForm.formState.errors.email && (
+                  {loginForm.formState.errors.identifier && (
                     <p className="text-xs text-destructive mt-1">
-                      {loginForm.formState.errors.email.message}
+                      {loginForm.formState.errors.identifier.message}
                     </p>
                   )}
                 </div>
 
                 {/* Password */}
                 <div className="space-y-1.5">
-                  <label htmlFor="login-password" className="text-sm font-medium text-foreground">
-                    Password
-                  </label>
+                  <div className="flex items-center justify-between">
+                    <label htmlFor="login-password" className="text-sm font-medium text-foreground">
+                      Password
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowResetMsg(true);
+                        toast.error("Password reset is currently unavailable. Please contact support.");
+                      }}
+                      className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
                   <div className="relative">
                     <input
                       id="login-password"
@@ -216,6 +258,16 @@ export function LoginModal() {
                     </p>
                   )}
                 </div>
+
+                {/* Password Reset Unavailable Alert */}
+                {showResetMsg && (
+                  <Alert variant="destructive" className="bg-destructive/5 text-destructive border-destructive/10">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription className="text-xs font-medium">
+                      Password reset is currently unavailable. Please contact support.
+                    </AlertDescription>
+                  </Alert>
+                )}
 
                 {/* Submit */}
                 <button

@@ -16,7 +16,7 @@ export type User = {
 type AuthCtx = {
   user: User | null;
   isLoggedIn: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (identifier: string, password: string) => Promise<boolean>;
   signup: (data: { email: string; phone: string; password: string; firstName?: string; lastName?: string }) => Promise<boolean>;
   logout: () => void;
   // Modal control
@@ -67,9 +67,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // ── Login ───────────────────────────────────────────────────────────────────
 
-  const login = useCallback(async (email: string, password: string): Promise<boolean> => {
-    console.log(`[auth] Attempting login for: ${email}`);
-    const { data, error } = await loginUser(email.trim().toLowerCase(), password);
+  const login = useCallback(async (identifier: string, password: string): Promise<boolean> => {
+    console.log(`[auth] Attempting login for: ${identifier}`);
+    const { data, error } = await loginUser(identifier.trim().toLowerCase(), password);
 
     if (error || !data?.user) {
       console.error("[auth] Login failed:", error);
@@ -86,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     setUser(userData);
-    console.log(`[auth] Login successful for: ${email}`);
+    console.log(`[auth] Login successful for: ${identifier}`);
     toast.success(`Welcome back${data.user.first_name ? `, ${data.user.first_name}` : ""}! 🎉`);
 
     // Close modal and trigger callback

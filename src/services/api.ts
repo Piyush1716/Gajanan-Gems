@@ -22,7 +22,7 @@ async function apiFetch<T>(
 ): Promise<{ data: T | null; error: string | null }> {
   const url = `${BASE_URL}${path}`;
 
-  console.log(`[api] ${options?.method ?? "GET"} ${url}`, options?.body ? JSON.parse(options.body as string) : "");
+  console.log(`[api] ${options?.method ?? "GET"} ${url}`);
 
   try {
     const res = await fetch(url, {
@@ -129,11 +129,11 @@ export type ApiOrder = {
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 
-export async function loginUser(email: string, password: string) {
-  console.log(`[api/auth] Logging in user: ${email}`);
+export async function loginUser(identifier: string, password: string) {
+  console.log(`[api/auth] Logging in user: ${identifier}`);
   return apiFetch<{ user: ApiUser }>("/api/auth/login", {
     method: "POST",
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ identifier, password }),
   });
 }
 

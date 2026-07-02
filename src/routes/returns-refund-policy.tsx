@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -51,7 +52,7 @@ function ReturnsPage() {
         <p>
           Once we receive the returned items, our team will inspect them for eligibility. If the
           items meet our return criteria, we will process the refund via bank transfer only. Kindly
-          share your bank details by Email: hello@gajanangems.com or WhatsApp: 9537066979. If
+          share your bank details by Email: {CONTACT_EMAIL} or WhatsApp: {CONTACT_PHONE}. If
           you opt to replace or change any received item, please note that return courier charges of
           up to ₹150 will apply. Replacement or exchange will be facilitated upon receipt of the
           item at our office.
@@ -84,9 +85,7 @@ function ReturnsPage() {
         <p>
           For any questions or concerns regarding our return and refund policy, please contact our
           customer service team at{" "}
-          <a href="mailto:hello@gajanangems.com" className="text-primary underline">
-            hello@gajanangems.com
-          </a>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary underline">{CONTACT_EMAIL}</a>
           .
         </p>
         <p>

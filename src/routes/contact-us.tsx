@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { PageBanner } from "@/components/PageBanner";
@@ -10,8 +11,7 @@ export const Route = createFileRoute("/contact-us")({
       { title: "Contact Us — GajananGems" },
       {
         name: "description",
-        content:
-          "Get in touch with GajananGems. Email hello@gajanangems.com, call +91 95370 66979, or visit us in Khambhat.",
+        content: `Get in touch with GajananGems. Email ${CONTACT_EMAIL}, call +91 ${CONTACT_PHONE}, or visit us in Khambhat.`,
       },
       { property: "og:title", content: "Contact Us — GajananGems" },
       { property: "og:url", content: "/contact-us" },
@@ -22,8 +22,8 @@ export const Route = createFileRoute("/contact-us")({
 });
 
 const details = [
-  { icon: Mail, label: "Email", value: "hello@gajanangems.com", href: "mailto:hello@gajanangems.com" },
-  { icon: Phone, label: "Phone / WhatsApp", value: "+91 95370 66979", href: "tel:+919537066979" },
+  { icon: Mail, label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
+  { icon: Phone, label: "Phone / WhatsApp", value: `+91 ${CONTACT_PHONE}`, href: `tel:+91${CONTACT_PHONE}` },
   { icon: MapPin, label: "Showroom", value: "Khambhat, Gujarat, India", href: "https://maps.app.goo.gl/KhdT6hYsLYSjpuXi8" },
 ];
 

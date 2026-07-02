@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";
@@ -131,7 +132,7 @@ function OrderConfirmationPage() {
             <div className="border border-border rounded-xl p-4 bg-card flex flex-col items-center text-center gap-2">
               <MessageCircle className="h-6 w-6 text-primary" />
               <p className="text-xs font-medium">Need help?</p>
-              <p className="text-xs text-muted-foreground">WhatsApp +91 95370 66979</p>
+              <p className="text-xs text-muted-foreground">WhatsApp +91 {CONTACT_PHONE}</p>
             </div>
           </div>
 
@@ -179,14 +180,14 @@ function OrderConfirmationPage() {
             <p className="mb-3">Have questions about your order?</p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="mailto:hello@gajanangems.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="text-primary hover:underline font-medium"
               >
                 📧 Email us
               </a>
               <span className="hidden sm:inline text-border">•</span>
               <a
-                href="https://wa.me/919537066979"
+                href={`https://wa.me/91${CONTACT_PHONE}`}
                 className="text-primary hover:underline font-medium"
                 target="_blank"
                 rel="noopener noreferrer"

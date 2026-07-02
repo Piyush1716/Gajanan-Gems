@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
@@ -207,7 +208,7 @@ function OrderTrackingPage() {
       console.log(`[order-tracking] Found order ${id} — status: ${data.status}`);
       setOrder(data as unknown as Order);
     } catch {
-      setError("Something went wrong. Please try again or contact us at hello@gajanangems.com.");
+      setError(`Something went wrong. Please try again or contact us at ${CONTACT_EMAIL}.`);
     } finally {
       setLoading(false);
     }
@@ -454,13 +455,9 @@ function OrderTrackingPage() {
             {/* Help */}
             <p className="text-center text-xs text-muted-foreground">
               Need help? Email{" "}
-              <a href="mailto:hello@gajanangems.com" className="text-primary underline">
-                hello@gajanangems.com
-              </a>{" "}
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary underline">{CONTACT_EMAIL}</a>{" "}
               or WhatsApp{" "}
-              <a href="https://wa.me/919537066979" className="text-primary underline" target="_blank" rel="noopener noreferrer">
-                +91 95370 66979
-              </a>
+              <a href={`https://wa.me/91${CONTACT_PHONE}`} className="text-primary underline" target="_blank" rel="noopener noreferrer">+91 {CONTACT_PHONE}</a>
             </p>
           </div>
         )}

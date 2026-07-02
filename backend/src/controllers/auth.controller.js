@@ -11,28 +11,31 @@ import { supabase } from "../lib/supabase.js";
 
 export async function login(req, res, next) {
   try {
-    const { email, password } = req.body;
+    const { email, password, identifier: reqIdentifier } = req.body;
+    const identifier = reqIdentifier || email;
 
-    console.log(`[auth] Login attempt for: ${email}`);
+    console.log(`[auth] Login attempt for: ${identifier}`);
 
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
+    if (!identifier || !password) {
+      return res.status(400).json({ error: "Email or phone number and password are required" });
     }
+
+    const cleanIdentifier = identifier.trim().toLowerCase();
 
     const { data, error } = await supabase
       .from("users")
       .select("id, email, phone, first_name, last_name")
-      .eq("email", email.trim().toLowerCase())
+      .or(`email.eq.${cleanIdentifier},phone.eq.${identifier.trim()}`)
       .eq("password", password)
       .limit(1)
       .single();
 
     if (error || !data) {
-      console.log(`[auth] Login failed for: ${email} — invalid credentials`);
-      return res.status(401).json({ error: "Invalid email or password." });
+      console.log(`[auth] Login failed for: ${identifier} — invalid credentials`);
+      return res.status(401).json({ error: "Invalid email/phone or password." });
     }
 
-    console.log(`[auth] Login successful for: ${email} (id: ${data.id})`);
+    console.log(`[auth] Login successful for: ${identifier} (id: ${data.id})`);
     res.json({ user: data });
   } catch (err) {
     console.error("[auth] Login unexpected error:", err);

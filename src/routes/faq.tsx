@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -22,7 +23,7 @@ const faqs = [
   },
   {
     q: "Whom should I talk to if I have a concern?",
-    a: "Feel free to reach us at hello@gajanangems.com and we'll be more than happy to assist you.",
+    a: `Feel free to reach us at ${CONTACT_EMAIL} and we'll be more than happy to assist you.`,
   },
 ];
 

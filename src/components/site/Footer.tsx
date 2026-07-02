@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube, Mail, Phone } from "lucide-react";
 
@@ -56,8 +57,8 @@ export function Footer() {
           <h4 className="text-sm uppercase tracking-wider mb-4" style={{ color: "#F8F3EE" }}>Contact Us</h4>
           <p className="text-sm mb-3" style={{ color: "rgba(248,243,238,0.70)" }}>We're here to help! Reach out to us for any queries or support.</p>
           <div className="mt-5 space-y-2 text-sm" style={{ color: "rgba(248,243,238,0.70)" }}>
-            <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><a href="tel:+919537066979"> +91 95370 66979</a></div>
-            <div className="flex items-center gap-2"><Mail className="h-4 w-4" /><a href="mailto:hello@gajanangems.com"> hello@gajanangems.com</a></div>
+            <div className="flex items-center gap-2"><Phone className="h-4 w-4" /><a href={`tel:+91${CONTACT_PHONE}`}>+91 {CONTACT_PHONE}</a></div>
+            <div className="flex items-center gap-2"><Mail className="h-4 w-4" /><a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></div>
           </div>
         </div>
       </div>

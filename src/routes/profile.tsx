@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
@@ -619,18 +620,14 @@ function ProfilePage() {
         <div className="mt-12 text-center text-xs text-muted-foreground">
           <p>
             Need help? Email{" "}
-            <a href="mailto:hello@gajanangems.com" className="text-primary underline">
-              hello@gajanangems.com
-            </a>{" "}
+            <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary underline">{CONTACT_EMAIL}</a>{" "}
             or WhatsApp{" "}
             <a
-              href="https://wa.me/919537066979"
+              href={`https://wa.me/91${CONTACT_PHONE}`}
               className="text-primary underline"
               target="_blank"
               rel="noopener noreferrer"
-            >
-              +91 95370 66979
-            </a>
+            >+91 {CONTACT_PHONE}</a>
           </p>
         </div>
       </main>

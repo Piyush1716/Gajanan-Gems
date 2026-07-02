@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useState } from "react";
 import { toast } from "sonner";
 import { submitContact } from "@/services/api";
@@ -65,7 +66,7 @@ export function ContactForm({
       toast.success("Message sent! We'll be in touch soon.");
     } catch (err) {
       console.error("[ContactForm] fetch error:", err);
-      toast.error("Network error. Please email us directly at hello@gajanangems.com");
+      toast.error(`Network error. Please email us directly at ${CONTACT_EMAIL}`);
     } finally {
       setSubmitting(false);
     }

@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -83,9 +84,7 @@ function AboutPage() {
         <p>
           If you are looking for something specific or have a custom requirement, please write to
           us at{" "}
-          <a href="mailto:hello@gajanangems.com" className="text-primary underline">
-            hello@gajanangems.com
-          </a>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="text-primary underline">{CONTACT_EMAIL}</a>
           . You are also welcome to visit our showroom in Khambhat, Gujarat.
         </p>
       </article>

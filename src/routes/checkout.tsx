@@ -1,3 +1,4 @@
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -262,7 +263,7 @@ function CheckoutPage() {
 
         toast.error("Payment could not be verified. Please contact support.");
         setPaymentAttemptError(
-          "Payment signature verification failed. Please contact hello@gajanangems.com with your payment ID: " +
+          `Payment signature verification failed. Please contact ${CONTACT_EMAIL} with your payment ID: ` +
           response.razorpay_payment_id
         );
         setPlacing(false);
@@ -516,7 +517,7 @@ function CheckoutPage() {
       toast.error(errorMsg);
       setPlacing(false);
       setPaymentAttemptError(
-        "Failed to create order. Please check your connection and try again, or contact hello@gajanangems.com"
+        `Failed to create order. Please check your connection and try again, or contact ${CONTACT_EMAIL}`
       );
     }
   };
