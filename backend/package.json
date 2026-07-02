@@ -4,7 +4,7 @@
   "description": "Express backend for GajananGems ecommerce",
   "type": "module",
   "main": "src/index.js",
-  "scripts": {
+  "scripts": { 
     "dev": "nodemon --watch src/index.js",
     "start": "node src/index.js"
   },

@@ -54,26 +54,33 @@ app.use((req, res) => {
 
 app.use(errorHandler);
 
-// ─── Start Server ─────────────────────────────────────────────────────────────
+// ─── Start Server (Local) or Export (Vercel) ────────────────────────────────
 
-app.listen(PORT, () => {
-  console.log(`\n🚀 GajananGems backend running at http://localhost:${PORT}`);
-  console.log("   Endpoints:");
-  console.log("   GET  /api/health");
-  console.log("   POST /api/auth/login");
-  console.log("   POST /api/auth/signup");
-  console.log("   GET  /api/products");
-  console.log("   GET  /api/products/search?q=...");
-  console.log("   GET  /api/products/:slug");
-  console.log("   GET  /api/categories");
-  console.log("   GET  /api/categories/home");
-  console.log("   GET  /api/categories/:slug");
-  console.log("   POST /api/orders/create");
-  console.log("   GET  /api/orders/user/:userId");
-  console.log("   GET  /api/orders/track?orderId=&email=");
-  console.log("   POST /api/payments/create-order");
-  console.log("   POST /api/payments/verify");
-  console.log("   POST /api/payments/failure");
-  console.log("   POST /api/payments/cancel");
-  console.log("   POST /api/contact\n");
-});
+// Vercel serverless functions shouldn't listen on a port.
+// They just need the Express app exported.
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 GajananGems backend running at http://localhost:${PORT}`);
+    console.log("   Endpoints:");
+    console.log("   GET  /api/health");
+    console.log("   POST /api/auth/login");
+    console.log("   POST /api/auth/signup");
+    console.log("   GET  /api/products");
+    console.log("   GET  /api/products/search?q=...");
+    console.log("   GET  /api/products/:slug");
+    console.log("   GET  /api/categories");
+    console.log("   GET  /api/categories/home");
+    console.log("   GET  /api/categories/:slug");
+    console.log("   POST /api/orders/create");
+    console.log("   GET  /api/orders/user/:userId");
+    console.log("   GET  /api/orders/track?orderId=&email=");
+    console.log("   POST /api/payments/create-order");
+    console.log("   POST /api/payments/verify");
+    console.log("   POST /api/payments/failure");
+    console.log("   POST /api/payments/cancel");
+    console.log("   POST /api/contact\n");
+  });
+}
+
+// Export for Vercel
+export default app;
