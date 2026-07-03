@@ -10,19 +10,19 @@ export function OurCraftsmanship() {
       <div className="max-w-7xl mx-auto px-4 lg:px-6">
         <div
           ref={ref}
-          className={`grid md:grid-cols-2 gap-8 lg:gap-16 items-center transition-all duration-700 ${
+          className={`grid md:grid-cols-2 gap-8 lg:gap-16 items-center will-change-transform transition-all duration-700 ease-out ${
             isVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-8"
           }`}
         >
           {/* Left — Image */}
-          <div className="group rounded-2xl overflow-hidden shadow-lg">
+          <div className="group rounded-2xl overflow-hidden shadow-lg mb-6 md:mb-0 aspect-[4/3] md:aspect-auto">
             <img
               src="/images/homepage/gemologist-inspecting.png"
               alt="Gemologist carefully inspecting a gemstone"
               loading="lazy"
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
             />
           </div>
 
@@ -48,7 +48,7 @@ export function OurCraftsmanship() {
 
             <Link
               to="/about-us"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium transition-colors mt-6 sm:mt-8 text-sm sm:text-base"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-3 font-medium transition-colors mt-6 sm:mt-8 text-sm sm:text-base min-h-[44px]"
               style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}
               onMouseOver={(e) => {
                 (e.currentTarget as HTMLElement).style.backgroundColor = "#334D39";

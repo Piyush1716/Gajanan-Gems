@@ -26,7 +26,7 @@ function FeatureItem({ text, index }: { text: string; index: number }) {
   return (
     <div
       ref={ref}
-      className="flex items-center gap-3 transition-all duration-500"
+      className="flex items-center gap-3 transition-all duration-500 ease-out will-change-transform"
       style={{
         opacity: isVisible ? 1 : 0,
         transform: isVisible ? "translateY(0)" : "translateY(12px)",
@@ -56,7 +56,7 @@ export function WhyChooseUs() {
         >
           {/* Left column — text */}
           <div
-            className="transition-all duration-700"
+            className="transition-all duration-700 ease-out will-change-transform"
             style={{
               opacity: sectionVisible ? 1 : 0,
               transform: sectionVisible ? "translateX(0)" : "translateX(-30px)",
@@ -65,7 +65,7 @@ export function WhyChooseUs() {
             <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-primary mb-2">
               Why Choose Us
             </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display mb-6 sm:mb-8">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display mb-6 sm:mb-8 leading-tight">
               Why Choose Gajanan Gems?
             </h2>
 
@@ -78,7 +78,7 @@ export function WhyChooseUs() {
             <div className="mt-8 sm:mt-10">
               <Link
                 to="/categories"
-                className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-medium transition-colors cursor-pointer"
+                className="inline-flex items-center justify-center gap-2 rounded-full px-5 sm:px-6 py-3 text-sm sm:text-base font-medium min-h-[44px] transition-colors ease-out cursor-pointer"
                 style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}
                 onMouseOver={(e) =>
                   (e.currentTarget.style.backgroundColor = "#56785D")
@@ -94,7 +94,7 @@ export function WhyChooseUs() {
 
           {/* Right column — 2×2 image grid */}
           <div
-            className="grid grid-cols-2 gap-3 transition-all duration-700"
+            className="grid grid-cols-2 gap-2 sm:gap-3 transition-all duration-700 ease-out will-change-transform"
             style={{
               opacity: sectionVisible ? 1 : 0,
               transform: sectionVisible ? "translateX(0)" : "translateX(30px)",
@@ -109,7 +109,7 @@ export function WhyChooseUs() {
                   src={img.src}
                   alt={img.alt}
                   loading="lazy"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out will-change-transform"
                 />
               </div>
             ))}

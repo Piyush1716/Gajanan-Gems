@@ -41,7 +41,7 @@ function ArtisanCard({ artisan, index }: { artisan: Artisan; index: number }) {
   return (
     <div
       ref={ref}
-      className={`group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 ${
+      className={`group bg-card rounded-2xl overflow-hidden border border-border hover:shadow-xl transition-all duration-300 ease-out will-change-transform ${
         isVisible
           ? "opacity-100 translate-y-0 scale-100"
           : "opacity-0 translate-y-8 scale-95"
@@ -58,11 +58,11 @@ function ArtisanCard({ artisan, index }: { artisan: Artisan; index: number }) {
           src={artisan.image}
           alt={artisan.name}
           loading="lazy"
-          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out will-change-transform"
         />
         {/* Experience badge */}
         <span
-          className="absolute top-3 left-3 text-[10px] sm:text-xs font-medium uppercase tracking-wider px-3 py-1 rounded-full"
+          className="absolute top-3 left-3 text-[10px] sm:text-xs font-medium uppercase tracking-wider px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full"
           style={{ backgroundColor: "#3F5C45", color: "#FFFFFF" }}
         >
           {artisan.experience}
@@ -70,7 +70,7 @@ function ArtisanCard({ artisan, index }: { artisan: Artisan; index: number }) {
       </div>
 
       {/* Text area */}
-      <div className="p-5 sm:p-6">
+      <div className="p-4 sm:p-5 md:p-6">
         <h3 className="font-display text-lg sm:text-xl font-bold">
           {artisan.name}
         </h3>
@@ -97,7 +97,7 @@ export function MeetArtisans() {
         {/* Section header */}
         <div
           ref={headerRef}
-          className={`text-center mb-8 sm:mb-12 transition-all duration-600 ${
+          className={`text-center mb-8 sm:mb-12 transition-all duration-600 ease-out will-change-transform ${
             headerVisible
               ? "opacity-100 translate-y-0"
               : "opacity-0 translate-y-6"
@@ -106,7 +106,7 @@ export function MeetArtisans() {
           <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-primary mb-2">
             OUR ARTISANS
           </p>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display leading-tight">
             Meet Our Artisans
           </h2>
           <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-xl mx-auto">
@@ -115,7 +115,7 @@ export function MeetArtisans() {
         </div>
 
         {/* Cards grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
           {artisans.map((artisan, index) => (
             <ArtisanCard key={artisan.name} artisan={artisan} index={index} />
           ))}

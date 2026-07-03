@@ -60,7 +60,7 @@ function StatBlock({
   return (
     <div className="text-center">
       <p
-        className="text-4xl sm:text-5xl md:text-6xl font-display font-bold"
+        className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold leading-tight"
         style={{ color: "#3F5C45" }}
       >
         {count.toLocaleString()}
@@ -84,11 +84,11 @@ export function NumbersSection() {
     <section className="bg-background py-12 sm:py-16">
       <div
         ref={ref}
-        className={`max-w-7xl mx-auto px-4 lg:px-6 transition-all duration-700 ${
+        className={`max-w-7xl mx-auto px-4 lg:px-6 will-change-transform transition-all duration-700 ease-out ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
           {stats.map((stat) => (
             <StatBlock
               key={stat.label}

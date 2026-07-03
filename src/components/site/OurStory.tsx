@@ -13,7 +13,7 @@ export function OurStory() {
         >
           {/* Left side — image with gold accent frame */}
           <div
-            className="relative transition-all duration-700"
+            className="relative mb-8 md:mb-0 transition-all duration-700 ease-out will-change-transform"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "translateX(0)" : "translateX(-40px)",
@@ -21,10 +21,10 @@ export function OurStory() {
           >
             {/* Decorative gold border offset behind the image */}
             <div
-              className="absolute -bottom-3 -right-3 sm:-bottom-4 sm:-right-4 w-full h-full rounded-2xl pointer-events-none"
+              className="hidden sm:block absolute -bottom-3 -right-3 sm:-bottom-4 sm:-right-4 w-full h-full rounded-2xl pointer-events-none"
               style={{ border: "2px solid #C8A96B" }}
             />
-            <div className="relative rounded-2xl overflow-hidden shadow-lg">
+            <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
               <img
                 src="/images/homepage/artisan-workshop.png"
                 alt="Artisan workshop — traditional Indian gemstone craftsmanship"
@@ -36,7 +36,7 @@ export function OurStory() {
 
           {/* Right side — story text */}
           <div
-            className="transition-all duration-700"
+            className="transition-all duration-700 ease-out will-change-transform"
             style={{
               opacity: isVisible ? 1 : 0,
               transform: isVisible ? "translateX(0)" : "translateX(40px)",
@@ -45,7 +45,7 @@ export function OurStory() {
             <p className="text-xs sm:text-sm uppercase tracking-[0.3em] text-primary mb-2">
               Our Story
             </p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display mb-6">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display mb-6 leading-tight">
               From the Heart of India
             </h2>
 
@@ -62,7 +62,7 @@ export function OurStory() {
 
             <Link
               to="/about-us"
-              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-medium transition-colors cursor-pointer border"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-5 sm:px-6 py-3 text-sm sm:text-base font-medium min-h-[44px] transition-colors ease-out cursor-pointer border"
               style={{
                 borderColor: "#3F5C45",
                 color: "#3F5C45",

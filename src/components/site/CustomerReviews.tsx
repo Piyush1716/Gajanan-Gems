@@ -84,7 +84,7 @@ export function CustomerReviews() {
     <section className="bg-secondary/40 py-12 sm:py-16">
       <div
         ref={ref}
-        className={`max-w-7xl mx-auto px-4 lg:px-6 transition-all duration-700 ${
+        className={`max-w-7xl mx-auto px-4 lg:px-6 will-change-transform transition-all duration-700 ease-out ${
           isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
         }`}
       >
@@ -103,7 +103,7 @@ export function CustomerReviews() {
           {/* Arrows */}
           <button
             onClick={scrollPrev}
-            className="absolute -left-2 sm:-left-4 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow-md transition-colors cursor-pointer"
+            className="absolute left-1 sm:-left-4 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-md transition-colors cursor-pointer"
             style={{ backgroundColor: "rgba(247,244,238,0.80)" }}
             onMouseOver={(e) =>
               (e.currentTarget.style.backgroundColor = "#F7F4EE")
@@ -118,7 +118,7 @@ export function CustomerReviews() {
           </button>
           <button
             onClick={scrollNext}
-            className="absolute -right-2 sm:-right-4 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 shadow-md transition-colors cursor-pointer"
+            className="absolute right-1 sm:-right-4 top-1/2 -translate-y-1/2 z-10 rounded-full p-2 min-h-[44px] min-w-[44px] flex items-center justify-center shadow-md transition-colors cursor-pointer"
             style={{ backgroundColor: "rgba(247,244,238,0.80)" }}
             onMouseOver={(e) =>
               (e.currentTarget.style.backgroundColor = "#F7F4EE")
@@ -133,8 +133,8 @@ export function CustomerReviews() {
           </button>
 
           {/* Embla viewport */}
-          <div className="overflow-hidden mx-6 sm:mx-8" ref={emblaRef}>
-            <div className="flex gap-4 sm:gap-6">
+          <div className="overflow-hidden mx-8 sm:mx-10" ref={emblaRef}>
+            <div className="flex gap-3 sm:gap-4 lg:gap-6">
               {reviews.map((review) => (
                 <div
                   key={review.name}

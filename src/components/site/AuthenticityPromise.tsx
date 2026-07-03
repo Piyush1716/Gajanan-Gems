@@ -30,7 +30,7 @@ export function AuthenticityPromise() {
             Our Promise
           </p>
           <h2
-            className={`font-display text-3xl sm:text-4xl md:text-5xl font-semibold transition-all duration-700 delay-100 ${
+            className={`font-display text-3xl sm:text-4xl md:text-5xl font-semibold leading-tight transition-all duration-700 delay-100 ${
               isVisible
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -55,7 +55,7 @@ export function AuthenticityPromise() {
           {promises.map((item, i) => (
             <div
               key={item.label}
-              className={`flex flex-col items-center text-center px-4 py-8 sm:py-10 rounded-2xl transition-all duration-700 ${
+              className={`flex flex-col items-center text-center px-3 py-6 sm:px-4 sm:py-10 rounded-2xl will-change-transform transition-all duration-700 ease-out ${
                 isVisible
                   ? "opacity-100 translate-y-0"
                   : "opacity-0 translate-y-6"
@@ -66,11 +66,11 @@ export function AuthenticityPromise() {
             >
               {/* Icon Circle */}
               <div
-                className="h-14 w-14 rounded-full flex items-center justify-center mb-5"
+                className="h-12 w-12 sm:h-14 sm:w-14 rounded-full flex items-center justify-center mb-5"
                 style={{ backgroundColor: "rgba(248,243,238,0.10)" }}
               >
                 <item.icon
-                  className="h-6 w-6"
+                  className="h-5 w-5 sm:h-6 sm:w-6"
                   style={{ color: "#C8A96B" }}
                 />
               </div>
