@@ -22,7 +22,7 @@ function Index() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <main>
+      <main className="overflow-x-hidden">
         <HeroSlider />
         <ValueProps />
         <TopCategories />
