@@ -15,13 +15,48 @@ import { supabase } from "../lib/supabase.js";
  */
 export async function createOrder(req, res, next) {
   try {
-    const { userId, billing, items, subtotal, shipping = 0, total } = req.body;
+    const { userId, billing, items, subtotal, total } = req.body;
+    const shipping = 0; // free delivery — server-authoritative, never trust client value
 
     console.log(`[orders] Creating order for user_id=${userId}, total=₹${total}`);
 
     if (!billing || !items || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "billing and items are required" });
     }
+
+    // Validate items before fetching prices
+    for (const item of items) {
+      if (!item.productId || !Number.isInteger(item.productId) || item.productId <= 0) {
+        return res.status(400).json({ error: "Missing or invalid productId" });
+      }
+      if (!Number.isInteger(item.qty) || item.qty <= 0 || item.qty > 50) {
+        return res.status(400).json({ error: `Invalid quantity for item ${item.slug ?? item.productId}` });
+      }
+    }
+
+    // Fetch authoritative prices from DB
+    const productIds = items.map((item) => item.productId).filter(Boolean);
+    const { data: dbProducts, error: productsError } = await supabase
+      .from("products")
+      .select("id, price")
+      .in("id", productIds);
+
+    if (productsError) {
+      return res.status(500).json({ error: "Failed to fetch product prices" });
+    }
+
+    let serverSubtotal = 0;
+    const validItems = items.map((item) => {
+      const dbProduct = dbProducts.find((p) => p.id === item.productId);
+      if (!dbProduct) {
+        throw new Error(`Invalid product ID: ${item.productId}`);
+      }
+      serverSubtotal += dbProduct.price * item.qty;
+      return { ...item, price: dbProduct.price };
+    });
+
+    const serverTotal = serverSubtotal + Number(shipping);
+    console.log(`[orders] Server-computed total: ₹${serverTotal} (client sent: ₹${total})`);
 
     // Insert order row
     const { data: orderData, error: orderError } = await supabase
@@ -39,9 +74,9 @@ export async function createOrder(req, res, next) {
           pin: billing.pin,
           country: billing.country || "India",
           notes: billing.notes || null,
-          subtotal,
-          shipping,
-          total,
+          subtotal: serverSubtotal,
+          shipping: Number(shipping),
+          total: serverTotal,
           payment_method: "razorpay",
           status: "payment_pending",
           payment_error: null,
@@ -61,9 +96,9 @@ export async function createOrder(req, res, next) {
     console.log(`[orders] Order row created: id=${orderId}`);
 
     // Insert order_items
-    const orderItems = items.map((item) => ({
+    const orderItems = validItems.map((item) => ({
       order_id: orderId,
-      product_id: item.productId || null,
+      product_id: item.productId,
       slug: item.slug,
       title: item.title,
       price: item.price,
@@ -88,74 +123,7 @@ export async function createOrder(req, res, next) {
   }
 }
 
-// ── Update payment retry tracking ─────────────────────────────────────────────
 
-/**
- * PATCH /api/orders/:id/payment-attempt
- * Body: { attemptNumber }
- */
-export async function updatePaymentAttempt(req, res, next) {
-  try {
-    const orderId = parseInt(req.params.id, 10);
-    const { attemptNumber } = req.body;
-
-    console.log(`[orders] Updating payment attempt tracking: orderId=${orderId}, attempt=${attemptNumber}`);
-
-    const { error } = await supabase
-      .from("orders")
-      .update({
-        payment_retry_count: attemptNumber,
-        last_payment_attempt_at: new Date().toISOString(),
-      })
-      .eq("id", orderId);
-
-    if (error) {
-      console.error("[orders] updatePaymentAttempt error:", error);
-      return res.status(500).json({ error: error.message });
-    }
-
-    console.log(`[orders] Payment attempt ${attemptNumber} tracked for order ${orderId}`);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("[orders] Unexpected error in updatePaymentAttempt:", err);
-    next(err);
-  }
-}
-
-// ── Log a new payment attempt row ─────────────────────────────────────────────
-
-/**
- * POST /api/orders/:id/log-attempt
- * Body: { attemptNumber, razorpayOrderId }
- */
-export async function logPaymentAttempt(req, res, next) {
-  try {
-    const orderId = parseInt(req.params.id, 10);
-    const { attemptNumber, razorpayOrderId } = req.body;
-
-    console.log(`[orders] Logging payment attempt: orderId=${orderId}, attempt=${attemptNumber}, rzpOrder=${razorpayOrderId}`);
-
-    const { error } = await supabase.from("payment_attempts").insert({
-      order_id: orderId,
-      attempt_number: attemptNumber,
-      status: "pending",
-      razorpay_order_id: razorpayOrderId,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    });
-
-    if (error) {
-      console.error("[orders] logPaymentAttempt error:", error);
-      return res.status(500).json({ error: error.message });
-    }
-
-    console.log(`[orders] Payment attempt logged: order ${orderId}, attempt ${attemptNumber}`);
-    res.json({ success: true });
-  } catch (err) {
-    console.error("[orders] Unexpected error in logPaymentAttempt:", err);
-    next(err);
-  }
-}
 
 // ── Update payment attempt status ─────────────────────────────────────────────
 
@@ -168,7 +136,24 @@ export async function updateAttemptStatus(req, res, next) {
     const orderId = parseInt(req.params.id, 10);
     const { attemptNumber, status, razorpayPaymentId, paymentResponse, errorMessage } = req.body;
 
+    // Security check: only allow updating to success from the server
+    if (status === "success") {
+      return res.status(403).json({ error: "Forbidden: Cannot set status to success via this endpoint" });
+    }
+
     console.log(`[orders] Updating attempt status: orderId=${orderId}, attempt=${attemptNumber}, status=${status}`);
+
+    // Reject if attempt does not exist
+    const { data: existingAttempt, error: attemptCheckError } = await supabase
+      .from("payment_attempts")
+      .select("id")
+      .eq("order_id", orderId)
+      .eq("attempt_number", attemptNumber)
+      .single();
+
+    if (attemptCheckError || !existingAttempt) {
+      return res.status(404).json({ error: "Payment attempt not found" });
+    }
 
     const updatePayload = {
       status,
@@ -208,6 +193,11 @@ export async function updateOrderStatus(req, res, next) {
   try {
     const orderId = parseInt(req.params.id, 10);
     const { status, razorpayPaymentId, paymentError } = req.body;
+
+    const CLIENT_ALLOWED_STATUSES = new Set(["payment_failed", "payment_cancelled"]);
+    if (!CLIENT_ALLOWED_STATUSES.has(status)) {
+      return res.status(403).json({ error: `Forbidden: cannot set status "${status}" via this endpoint` });
+    }
 
     console.log(`[orders] Updating order status: orderId=${orderId}, status=${status}`);
 

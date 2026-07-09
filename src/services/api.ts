@@ -220,21 +220,7 @@ export async function createOrder(payload: {
   });
 }
 
-export async function logPaymentAttempt(orderId: number, attemptNumber: number, razorpayOrderId: string) {
-  console.log(`[api/orders] Logging payment attempt: orderId=${orderId}, attempt=${attemptNumber}`);
-  return apiFetch<{ success: boolean }>(`/api/orders/${orderId}/log-attempt`, {
-    method: "POST",
-    body: JSON.stringify({ attemptNumber, razorpayOrderId }),
-  });
-}
 
-export async function updatePaymentAttempt(orderId: number, attemptNumber: number) {
-  console.log(`[api/orders] Updating payment retry tracking: orderId=${orderId}, attempt=${attemptNumber}`);
-  return apiFetch<{ success: boolean }>(`/api/orders/${orderId}/payment-attempt`, {
-    method: "PATCH",
-    body: JSON.stringify({ attemptNumber }),
-  });
-}
 
 export async function updateAttemptStatus(
   orderId: number,
@@ -294,7 +280,7 @@ export async function trackOrder(orderId: number, email: string, userId?: string
 
 export async function createRazorpayOrder(amount: number, currency = "INR", receipt: string) {
   console.log(`[api/payments] Creating Razorpay order: amount=${amount}, receipt=${receipt}`);
-  return apiFetch<{ order_id: string; amount: number; currency: string }>(
+  return apiFetch<{ order_id: string; amount: number; currency: string; attemptNumber: number }>(
     "/api/payments/create-order",
     {
       method: "POST",

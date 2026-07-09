@@ -14,8 +14,6 @@ import { ShieldCheck, Truck, CreditCard, Lock, AlertCircle } from "lucide-react"
 import DOMPurify from "dompurify";
 import {
   createOrder as apiCreateOrder,
-  logPaymentAttempt,
-  updatePaymentAttempt,
   createRazorpayOrder,
   verifyPayment as apiVerifyPayment,
   updateAttemptStatus,
@@ -192,7 +190,7 @@ function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [paymentAttemptError, setPaymentAttemptError] = useState<string | null>(null);
   const pendingOrderId = useRef<number | null>(null);
-  const paymentRetryCount = useRef(0);
+
   // Razorpay order ID returned by /api/create-order (server-generated)
   const rzpOrderIdRef = useRef<string | null>(null);
 
@@ -270,24 +268,10 @@ function CheckoutPage() {
         return;
       }
 
-      // ── Step 2: Update payment_attempts to success ──────────────────────────
-      console.log(`[checkout] Updating payment attempt to success: order=${orderId}`);
-      await updateAttemptStatus(orderId, attemptNumber, "success", {
-        razorpayPaymentId: response.razorpay_payment_id,
-        paymentResponse: response as unknown as Record<string, unknown>,
-      });
+      // The backend apiVerifyPayment endpoint now handles marking the payment attempt
+      // as success and the order as confirmed securely.
 
-      // ── Step 3: Confirm the order ───────────────────────────────────────────
-      const { error: confirmError } = await updateOrderStatus(orderId, "confirmed", {
-        razorpayPaymentId: response.razorpay_payment_id,
-        paymentError: null,
-      });
-
-      if (confirmError) {
-        throw new Error(`Failed to confirm order: ${confirmError}`);
-      }
-
-      // ── Step 3.5: Send Confirmation Email via Supabase Edge Function ────────
+      // ── Step 2: Send Confirmation Email via Supabase Edge Function ────────
       supabase.functions.invoke("send-order-email", {
         body: { 
           email: billing.email, 
@@ -498,18 +482,11 @@ function CheckoutPage() {
       }
 
       const rzpOrderId: string = rzpData.order_id;
+      const attemptNumber = rzpData.attemptNumber;
       rzpOrderIdRef.current = rzpOrderId;
-      console.log(`[checkout] Razorpay order created: ${rzpOrderId}`);
+      console.log(`[checkout] Razorpay order created: ${rzpOrderId}, attempt: ${attemptNumber}`);
 
-      // ── Step 3: Log payment attempt ─────────────────────────────────────────
-      const attemptNumber = (paymentRetryCount.current ?? 0) + 1;
-      paymentRetryCount.current = attemptNumber;
-      console.log(`[checkout] Logging payment attempt #${attemptNumber}`);
-
-      await logPaymentAttempt(orderId, attemptNumber, rzpOrderId);
-      await updatePaymentAttempt(orderId, attemptNumber);
-
-      // ── Step 4: Open Razorpay modal ─────────────────────────────────────────
+      // ── Step 3: Open Razorpay modal ─────────────────────────────────────────
       openRazorpay(orderId, attemptNumber, rzpOrderId, billing);
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
