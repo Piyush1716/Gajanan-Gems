@@ -1,24 +1,46 @@
-import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  type ReactNode,
+} from "react";
 import { toast } from "sonner";
 import DOMPurify from "dompurify";
-import { loginUser, signupUser } from "@/services/api";
+import { supabase } from "@/lib/supabase";
+import type { Session } from "@supabase/supabase-js";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
+// Phone regex: Indian mobile numbers starting with 6-9, exactly 10 digits
+const indianPhoneRegex = /^[6-9]\d{9}$/;
+
 export type User = {
-  id: number;
+  id: string; // UUID from Supabase auth.users
   email: string;
-  phone: string;
+  phone: string | null;
   first_name: string | null;
   last_name: string | null;
 };
 
 type AuthCtx = {
   user: User | null;
+  session: Session | null;
   isLoggedIn: boolean;
-  login: (identifier: string, password: string) => Promise<boolean>;
-  signup: (data: { email: string; phone: string; password: string; firstName?: string; lastName?: string }) => Promise<boolean>;
-  logout: () => void;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  signup: (data: {
+    email: string;
+    phone: string;
+    password: string;
+    firstName?: string;
+    lastName?: string;
+  }) => Promise<boolean>;
+  logout: () => Promise<void>;
+  // Email confirmation pending state
+  pendingEmail: string | null;
+  clearPendingEmail: () => void;
   // Modal control
   loginModalOpen: boolean;
   showLoginModal: (onSuccess?: () => void) => void;
@@ -26,137 +48,215 @@ type AuthCtx = {
 };
 
 const Ctx = createContext<AuthCtx | null>(null);
-const STORAGE_KEY = "gajanangems_user_v1";
+
+// ─── Helper: build User from Supabase session + profile ───────────────────────
+
+function buildUser(session: Session): User {
+  const meta = session.user.user_metadata ?? {};
+  return {
+    id: session.user.id,
+    email: session.user.email ?? "",
+    phone: meta.phone ?? null,
+    first_name: meta.first_name ?? null,
+    last_name: meta.last_name ?? null,
+  };
+}
 
 // ─── Provider ─────────────────────────────────────────────────────────────────
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    try {
-      const raw = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.id && parsed?.email) {
-          return parsed;
-        }
-      }
-    } catch {
-      // Invalid data — clear it
-      if (typeof window !== "undefined") {
-        localStorage.removeItem(STORAGE_KEY);
-      }
-    }
-    return null;
-  });
-  
-  const [loginModalOpen, setLoginModalOpen] = useState(false);
-  const [onSuccessCallback, setOnSuccessCallback] = useState<(() => void) | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  // true while the initial session is being restored on page load
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Persist user to localStorage whenever it changes
+  const [loginModalOpen, setLoginModalOpen] = useState(false);
+  const [onSuccessCallback, setOnSuccessCallback] = useState<
+    (() => void) | null
+  >(null);
+  // When set, signup was successful but email confirmation is pending
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
+
+  // ── Sync auth state from Supabase SDK ───────────────────────────────────────
+
   useEffect(() => {
-    try {
-      if (typeof window !== "undefined") {
-        if (user) {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-        } else {
-          localStorage.removeItem(STORAGE_KEY);
-        }
+    // 1. Restore existing session on mount (handles page refresh)
+    supabase.auth.getSession().then(({ data }) => {
+      const s = data.session;
+      if (s) {
+        setSession(s);
+        setUser(buildUser(s));
       }
-    } catch {}
-  }, [user]);
+      setIsLoading(false);
+    });
+
+    // 2. Subscribe to auth state changes (login, logout, token refresh, email confirmation)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, s) => {
+      setSession(s);
+      setUser(s ? buildUser(s) : null);
+      setIsLoading(false);
+
+      // When user clicks the confirmation link and is redirected back,
+      // Supabase fires SIGNED_IN. Clear the pending state and greet them.
+      if ((event === "SIGNED_IN" || event === "USER_UPDATED") && s) {
+        setPendingEmail((prev) => {
+          if (prev) {
+            // Small delay so the page has time to settle after redirect
+            setTimeout(() => {
+              const name = s.user.user_metadata?.first_name;
+              toast.success(
+                `Email confirmed! Welcome${name ? `, ${name}` : ""}! 🎉`
+              );
+            }, 300);
+            return null;
+          }
+          return prev;
+        });
+        // Also close the pending screen if modal is still open
+        setLoginModalOpen(false);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
 
   // ── Login ───────────────────────────────────────────────────────────────────
 
-  const login = useCallback(async (identifier: string, password: string): Promise<boolean> => {
-    console.log(`[auth] Attempting login for: ${identifier}`);
-    const { data, error } = await loginUser(identifier.trim().toLowerCase(), password);
+  const login = useCallback(
+    async (email: string, password: string): Promise<boolean> => {
+      console.log(`[auth] Attempting login for: ${email}`);
 
-    if (error || !data?.user) {
-      console.error("[auth] Login failed:", error);
-      toast.error(error || "Invalid email or password. Please try again.");
-      return false;
-    }
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-    const userData: User = {
-      id: data.user.id,
-      email: data.user.email,
-      phone: data.user.phone,
-      first_name: data.user.first_name,
-      last_name: data.user.last_name,
-    };
+      if (error || !data.session) {
+        console.error("[auth] Login failed:", error?.message);
 
-    setUser(userData);
-    console.log(`[auth] Login successful for: ${identifier}`);
-    toast.success(`Welcome back${data.user.first_name ? `, ${data.user.first_name}` : ""}! 🎉`);
+        // Provide friendly messages for common errors
+        if (error?.message?.toLowerCase().includes("email not confirmed")) {
+          toast.error(
+            "Please confirm your email before logging in. Check your inbox."
+          );
+        } else if (
+          error?.message?.toLowerCase().includes("invalid login credentials")
+        ) {
+          toast.error("Invalid email or password. Please try again.");
+        } else {
+          toast.error(error?.message ?? "Login failed. Please try again.");
+        }
+        return false;
+      }
 
-    // Close modal and trigger callback
-    setLoginModalOpen(false);
-    if (onSuccessCallback) {
-      // Run callback after a short delay to let the modal close
-      setTimeout(() => {
-        onSuccessCallback();
-        setOnSuccessCallback(null);
-      }, 150);
-    }
+      const built = buildUser(data.session);
+      console.log(`[auth] Login successful for: ${email}`);
+      toast.success(
+        `Welcome back${built.first_name ? `, ${built.first_name}` : ""}! 🎉`
+      );
 
-    return true;
-  }, [onSuccessCallback]);
+      setLoginModalOpen(false);
+      if (onSuccessCallback) {
+        setTimeout(() => {
+          onSuccessCallback();
+          setOnSuccessCallback(null);
+        }, 150);
+      }
+
+      return true;
+    },
+    [onSuccessCallback]
+  );
 
   // ── Signup ──────────────────────────────────────────────────────────────────
 
-  const signup = useCallback(async (data: {
-    email: string;
-    phone: string;
-    password: string;
-    firstName?: string;
-    lastName?: string;
-  }): Promise<boolean> => {
-    console.log(`[auth] Attempting signup for: ${data.email}`);
+  const signup = useCallback(
+    async (data: {
+      email: string;
+      phone: string;
+      password: string;
+      firstName?: string;
+      lastName?: string;
+    }): Promise<boolean> => {
+      console.log(`[auth] Attempting signup for: ${data.email}`);
 
-    const { data: resData, error } = await signupUser({
-      email: data.email.trim().toLowerCase(),
-      phone: data.phone.trim(),
-      password: data.password,
-      first_name: data.firstName ? DOMPurify.sanitize(data.firstName.trim()) : null,
-      last_name: data.lastName ? DOMPurify.sanitize(data.lastName.trim()) : null,
-    });
+      // Validate phone with the same regex used in the form
+      const cleanPhone = data.phone.trim();
+      if (!indianPhoneRegex.test(cleanPhone)) {
+        toast.error("Enter a valid 10-digit Indian mobile number.");
+        return false;
+      }
 
-    if (error || !resData?.user) {
-      console.error("[auth] Signup failed:", error);
-      toast.error(error || "Failed to create account. Please try again.");
+      const { data: authData, error } = await supabase.auth.signUp({
+        email: data.email.trim().toLowerCase(),
+        password: data.password,
+        options: {
+          data: {
+            phone: cleanPhone,
+            first_name: data.firstName
+              ? DOMPurify.sanitize(data.firstName.trim())
+              : null,
+            last_name: data.lastName
+              ? DOMPurify.sanitize(data.lastName.trim())
+              : null,
+          },
+        },
+      });
+
+      if (error) {
+        console.error("[auth] Signup failed:", error.message);
+        if (error.message?.toLowerCase().includes("already registered")) {
+          toast.error(
+            "This email is already registered. Please log in instead."
+          );
+        } else {
+          toast.error(error.message ?? "Failed to create account. Please try again.");
+        }
+        return false;
+      }
+
+      // If email confirmation is required, Supabase returns a user but no session.
+      // Keep the modal OPEN so the user sees the "Check your email" screen inside it.
+      if (authData.user && !authData.session) {
+        console.log(
+          `[auth] Signup successful — awaiting email confirmation: ${data.email}`
+        );
+        setPendingEmail(data.email.trim().toLowerCase());
+        // Do NOT close the modal — the pending screen will show inside it
+        return true;
+      }
+
+      // If email confirmation is disabled (instant login)
+      if (authData.session) {
+        console.log(`[auth] Signup + instant login for: ${data.email}`);
+        const firstName = data.firstName
+          ? DOMPurify.sanitize(data.firstName.trim())
+          : null;
+        toast.success(
+          `Account created! Welcome${firstName ? `, ${firstName}` : ""}! 🎉`
+        );
+        setLoginModalOpen(false);
+        if (onSuccessCallback) {
+          setTimeout(() => {
+            onSuccessCallback();
+            setOnSuccessCallback(null);
+          }, 150);
+        }
+        return true;
+      }
+
       return false;
-    }
-
-    const newUser = resData.user;
-
-    const userData: User = {
-      id: newUser.id,
-      email: newUser.email,
-      phone: newUser.phone,
-      first_name: newUser.first_name,
-      last_name: newUser.last_name,
-    };
-
-    setUser(userData);
-    console.log(`[auth] Signup successful for: ${data.email}`);
-    toast.success(`Account created successfully! Welcome${newUser.first_name ? `, ${newUser.first_name}` : ""}! 🎉`);
-
-    // Close modal and trigger callback
-    setLoginModalOpen(false);
-    if (onSuccessCallback) {
-      setTimeout(() => {
-        onSuccessCallback();
-        setOnSuccessCallback(null);
-      }, 150);
-    }
-
-    return true;
-  }, [onSuccessCallback]);
+    },
+    [onSuccessCallback]
+  );
 
   // ── Logout ──────────────────────────────────────────────────────────────────
 
-  const logout = useCallback(() => {
-    setUser(null);
+  const logout = useCallback(async () => {
+    await supabase.auth.signOut();
+    setPendingEmail(null);
     toast.success("You've been logged out.");
   }, []);
 
@@ -176,14 +276,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setOnSuccessCallback(null);
   }, []);
 
+  const clearPendingEmail = useCallback(() => {
+    setPendingEmail(null);
+  }, []);
+
   return (
     <Ctx.Provider
       value={{
         user,
+        session,
         isLoggedIn: !!user,
+        isLoading,
         login,
         signup,
         logout,
+        pendingEmail,
+        clearPendingEmail,
         loginModalOpen,
         showLoginModal,
         hideLoginModal,

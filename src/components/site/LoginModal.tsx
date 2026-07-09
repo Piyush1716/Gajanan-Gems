@@ -1,9 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Eye, EyeOff, Loader2, Gem, AlertCircle } from "lucide-react";
+import { Eye, EyeOff, Loader2, Gem, Mail } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/lib/supabase";
 
 import {
   Dialog,
@@ -13,7 +14,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+
 import { useAuth } from "@/lib/auth";
 
 // ─── Schemas ──────────────────────────────────────────────────────────────────
@@ -37,14 +38,8 @@ const sanitizeIdentifier = (val: string) => {
 const loginSchema = z.object({
   identifier: z
     .string()
-    .min(1, "Email or phone number is required")
-    .transform(sanitizeIdentifier)
-    .refine(
-      (val) => emailRegex.test(val) || indianPhoneRegex.test(val),
-      {
-        message: "Enter a valid email address or 10-digit Indian mobile number",
-      }
-    ),
+    .min(1, "Email address is required")
+    .regex(emailRegex, "Enter a valid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -74,16 +69,138 @@ type SignupValues = z.infer<typeof signupSchema>;
 const inputClasses =
   "w-full rounded-lg border border-input bg-background px-3 py-2.5 text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-colors";
 
-// ─── Component ────────────────────────────────────────────────────────────────
+// ─── Email Confirmation Screen ────────────────────────────────────────────────
+
+function EmailConfirmationScreen({
+  email,
+  onDone,
+  onBack,
+}: {
+  email: string;
+  onDone: () => void;
+  onBack: () => void;
+}) {
+  const COOLDOWN = 60;
+  const [countdown, setCountdown] = useState(0);
+  const [isSending, setIsSending] = useState(false);
+
+  // Start a 60s cooldown immediately so user can't spam resend on load
+  useEffect(() => {
+    setCountdown(COOLDOWN);
+    const interval = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(interval);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleResend = async () => {
+    setIsSending(true);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+    });
+    setIsSending(false);
+    if (error) {
+      toast.error("Could not resend email. Please try again.");
+    } else {
+      toast.success("Confirmation email resent! Check your inbox.");
+      // Reset cooldown
+      setCountdown(COOLDOWN);
+      const interval = setInterval(() => {
+        setCountdown((c) => {
+          if (c <= 1) { clearInterval(interval); return 0; }
+          return c - 1;
+        });
+      }, 1000);
+    }
+  };
+
+  return (
+    <div className="px-6 pb-8">
+      {/* Animated mail envelope */}
+      <div className="flex flex-col items-center text-center py-6">
+        <div className="relative mb-5">
+          {/* Outer pulsing ring */}
+          <div className="absolute inset-0 rounded-full bg-blue-100 animate-ping opacity-40" />
+          <div className="relative h-20 w-20 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-200 flex items-center justify-center shadow-md">
+            <Mail className="h-9 w-9 text-blue-500" />
+          </div>
+        </div>
+
+        <h3 className="text-xl font-bold tracking-tight mb-1">Check your inbox</h3>
+        <p className="text-sm text-muted-foreground mb-1">
+          We sent a confirmation link to
+        </p>
+        <p className="text-sm font-semibold text-foreground bg-muted/60 px-3 py-1 rounded-full mb-4 break-all">
+          {email}
+        </p>
+
+        {/* Steps */}
+        <ol className="text-left w-full space-y-2 mb-5">
+          {[
+            "Open the email from GajananGems",
+            "Click \"Confirm your email\"",
+            "You'll be signed in automatically",
+          ].map((step, i) => (
+            <li key={i} className="flex items-start gap-3 text-sm">
+              <span className="flex-shrink-0 h-5 w-5 rounded-full bg-primary/10 text-primary text-[11px] font-bold flex items-center justify-center mt-px">
+                {i + 1}
+              </span>
+              <span className="text-muted-foreground">{step}</span>
+            </li>
+          ))}
+        </ol>
+
+        {/* Done button */}
+        <button
+          onClick={onDone}
+          className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 active:scale-[0.98] transition-all shadow-md shadow-primary/20 mb-3"
+        >
+          Got it, I'll check my email
+        </button>
+
+        {/* Resend */}
+        <button
+          onClick={handleResend}
+          disabled={countdown > 0 || isSending}
+          className="w-full h-10 rounded-xl border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors mb-2"
+        >
+          {isSending
+            ? "Sending…"
+            : countdown > 0
+              ? `Resend email in ${countdown}s`
+              : "Resend confirmation email"}
+        </button>
+
+        {/* Back link */}
+        <button
+          type="button"
+          onClick={onBack}
+          className="text-xs text-muted-foreground hover:text-primary transition-colors"
+        >
+          Wrong email? Go back to sign up
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Modal ────────────────────────────────────────────────────────────────
 
 export function LoginModal() {
-  const { loginModalOpen, hideLoginModal, login, signup } = useAuth();
+  const { loginModalOpen, hideLoginModal, login, signup, pendingEmail, clearPendingEmail } = useAuth();
 
   const [activeTab, setActiveTab] = useState<"login" | "signup">("login");
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showSignupPassword, setShowSignupPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showResetMsg, setShowResetMsg] = useState(false);
+  const [isSendingReset, setIsSendingReset] = useState(false);
 
   // ── Login Form ────────────────────────────────────────────────────────────
 
@@ -114,7 +231,7 @@ export function LoginModal() {
     setShowLoginPassword(false);
     setShowSignupPassword(false);
     setShowConfirmPassword(false);
-    setShowResetMsg(false);
+    setIsSendingReset(false);
   }, [loginForm, signupForm]);
 
   // ── Handlers ──────────────────────────────────────────────────────────────
@@ -132,6 +249,24 @@ export function LoginModal() {
       lastName: values.lastName || undefined,
     });
   });
+
+  const handleForgotPassword = async () => {
+    const email = loginForm.getValues("identifier").trim().toLowerCase();
+    if (!email || !emailRegex.test(email)) {
+      toast.error("Enter your email address above, then click Forgot password.");
+      return;
+    }
+    setIsSendingReset(true);
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/reset-password`,
+    });
+    setIsSendingReset(false);
+    if (error) {
+      toast.error("Could not send reset email. Please try again.");
+    } else {
+      toast.success(`Password reset email sent to ${email}. Check your inbox.`);
+    }
+  };
 
   const handleTabChange = (value: string) => {
     setActiveTab(value as "login" | "signup");
@@ -155,24 +290,42 @@ export function LoginModal() {
     <Dialog open={loginModalOpen} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[440px] rounded-2xl p-0 gap-0 overflow-hidden border-border/50 shadow-2xl">
         {/* ── Header ─────────────────────────────────────────────────────── */}
-        <div className="bg-primary/[0.04] px-6 pt-8 pb-6">
+        <div className={`px-6 pt-8 pb-6 ${pendingEmail ? "bg-blue-50/60" : "bg-primary/[0.04]"}`}>
           <DialogHeader className="items-center text-center">
-            <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/20">
-              <Gem className="h-7 w-7 text-primary" />
+            <div className={`mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-2xl ring-1 transition-all ${
+              pendingEmail
+                ? "bg-blue-100 ring-blue-200"
+                : "bg-primary/10 ring-primary/20"
+            }`}>
+              {pendingEmail
+                ? <Mail className="h-7 w-7 text-blue-500" />
+                : <Gem className="h-7 w-7 text-primary" />}
             </div>
             <DialogTitle className="text-xl font-bold tracking-tight text-center">
-              Welcome to GajananGems
+              {pendingEmail ? "Verify your email" : "Welcome to GajananGems"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-center">
-              {activeTab === "login"
-                ? "Sign in to your account to continue shopping"
-                : "Create an account to start your gemstone journey"}
+              {pendingEmail
+                ? "One last step — confirm your email to activate your account"
+                : activeTab === "login"
+                  ? "Sign in to your account to continue shopping"
+                  : "Create an account to start your gemstone journey"}
             </DialogDescription>
           </DialogHeader>
         </div>
 
-        {/* ── Tabs ────────────────────────────────────────────────────────── */}
-        <div className="px-6 pt-4 pb-6">
+        {/* ── Email Confirmation Pending Screen ───────────────────────────── */}
+        {pendingEmail ? (
+          <EmailConfirmationScreen
+            email={pendingEmail}
+            onDone={hideLoginModal}
+            onBack={() => {
+              clearPendingEmail();
+              handleTabChange("signup");
+            }}
+          />
+        ) : (
+          <div className="px-6 pt-4 pb-6">
           <Tabs value={activeTab} onValueChange={handleTabChange}>
             <TabsList className="grid w-full grid-cols-2 h-11 rounded-xl bg-muted/70 p-1">
               <TabsTrigger
@@ -195,13 +348,13 @@ export function LoginModal() {
                 {/* Identifier */}
                 <div className="space-y-1.5">
                   <label htmlFor="login-identifier" className="text-sm font-medium text-foreground">
-                    Email Address or Phone Number
+                    Email Address
                   </label>
                   <input
                     id="login-identifier"
-                    type="text"
-                    placeholder="you@example.com or 9876543210"
-                    autoComplete="username"
+                    type="email"
+                    placeholder="you@example.com"
+                    autoComplete="email"
                     className={inputClasses}
                     {...loginForm.register("identifier")}
                   />
@@ -220,13 +373,11 @@ export function LoginModal() {
                     </label>
                     <button
                       type="button"
-                      onClick={() => {
-                        setShowResetMsg(true);
-                        toast.error("Password reset is currently unavailable. Please contact support.");
-                      }}
-                      className="text-xs text-primary hover:underline font-medium cursor-pointer"
+                      disabled={isSendingReset}
+                      onClick={handleForgotPassword}
+                      className="text-xs text-primary hover:underline font-medium cursor-pointer disabled:opacity-50"
                     >
-                      Forgot password?
+                      {isSendingReset ? "Sending…" : "Forgot password?"}
                     </button>
                   </div>
                   <div className="relative">
@@ -259,15 +410,7 @@ export function LoginModal() {
                   )}
                 </div>
 
-                {/* Password Reset Unavailable Alert */}
-                {showResetMsg && (
-                  <Alert variant="destructive" className="bg-destructive/5 text-destructive border-destructive/10">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription className="text-xs font-medium">
-                      Password reset is currently unavailable. Please contact support.
-                    </AlertDescription>
-                  </Alert>
-                )}
+                {/* No extra reset alert needed — handled via toast */}
 
                 {/* Submit */}
                 <button
@@ -497,6 +640,7 @@ export function LoginModal() {
             </TabsContent>
           </Tabs>
         </div>
+        )}
       </DialogContent>
     </Dialog>
   );

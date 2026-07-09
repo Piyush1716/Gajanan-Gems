@@ -56,9 +56,9 @@ async function apiFetch<T>(
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 export type ApiUser = {
-  id: number;
+  id: string; // UUID from Supabase auth.users
   email: string;
-  phone: string;
+  phone: string | null;
   first_name: string | null;
   last_name: string | null;
 };
@@ -127,28 +127,18 @@ export type ApiOrder = {
   }>;
 };
 
-// ─── Auth ─────────────────────────────────────────────────────────────────────
+// ─── Auth header helper ───────────────────────────────────────────────────────
 
-export async function loginUser(identifier: string, password: string) {
-  console.log(`[api/auth] Logging in user: ${identifier}`);
-  return apiFetch<{ user: ApiUser }>("/api/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ identifier, password }),
-  });
-}
+/**
+ * Returns Authorization header with the current Supabase session JWT.
+ * Returns an empty object if not logged in.
+ */
+import { supabase } from "@/lib/supabase";
 
-export async function signupUser(data: {
-  email: string;
-  phone: string;
-  password: string;
-  first_name?: string | null;
-  last_name?: string | null;
-}) {
-  console.log(`[api/auth] Signing up user: ${data.email}`);
-  return apiFetch<{ user: ApiUser }>("/api/auth/signup", {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+async function getAuthHeaders(): Promise<Record<string, string>> {
+  const { data } = await supabase.auth.getSession();
+  const token = data.session?.access_token;
+  return token ? { Authorization: `Bearer ${token}` } : {};
 }
 
 // ─── Products ─────────────────────────────────────────────────────────────────
@@ -198,7 +188,7 @@ export async function fetchCategoryBySlug(slug: string) {
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export async function createOrder(payload: {
-  userId?: number | null;
+  userId?: string | null;
   billing: {
     firstName: string;
     lastName: string;
@@ -282,16 +272,19 @@ export async function updateOrderStatus(
   });
 }
 
-export async function getOrdersByUser(userId: number) {
+export async function getOrdersByUser(userId: string) {
   console.log(`[api/orders] Fetching orders for user: ${userId}`);
-  return apiFetch<ApiOrder[]>(`/api/orders/user/${userId}`);
+  const authHeaders = await getAuthHeaders();
+  return apiFetch<ApiOrder[]>(`/api/orders/user/${encodeURIComponent(userId)}`, {
+    headers: authHeaders,
+  });
 }
 
-export async function trackOrder(orderId: number, email: string, userId?: number) {
+export async function trackOrder(orderId: number, email: string, userId?: string) {
   const params = new URLSearchParams({
     orderId: String(orderId),
     email,
-    ...(userId ? { userId: String(userId) } : {}),
+    ...(userId ? { userId } : {}),
   });
   console.log(`[api/orders] Tracking order: ${orderId}, email: ${email}`);
   return apiFetch<ApiOrder>(`/api/orders/track?${params.toString()}`);

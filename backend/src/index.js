@@ -12,7 +12,6 @@ import { corsMiddleware } from "./middleware/cors.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import { errorHandler } from "./middleware/errorHandler.js";
 
-import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/products.routes.js";
 import categoryRoutes from "./routes/categories.routes.js";
 import orderRoutes from "./routes/orders.routes.js";
@@ -30,7 +29,6 @@ app.use(requestLogger);
 
 // ─── Routes ───────────────────────────────────────────────────────────────────
 
-app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
@@ -63,8 +61,6 @@ if (process.env.NODE_ENV !== "production") {
     console.log(`\n🚀 GajananGems backend running at http://localhost:${PORT}`);
     console.log("   Endpoints:");
     console.log("   GET  /api/health");
-    console.log("   POST /api/auth/login");
-    console.log("   POST /api/auth/signup");
     console.log("   GET  /api/products");
     console.log("   GET  /api/products/search?q=...");
     console.log("   GET  /api/products/:slug");

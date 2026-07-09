@@ -4,6 +4,7 @@
 
 import { Router } from "express";
 import { generalLimiter } from "../middleware/rateLimiter.js";
+import { requireAuth } from "../middleware/auth.js";
 import {
   createOrder,
   updatePaymentAttempt,
@@ -18,7 +19,8 @@ const router = Router();
 
 // NOTE: specific routes before /:id param routes
 router.get("/track", generalLimiter, trackOrder);
-router.get("/user/:userId", generalLimiter, getOrdersByUser);
+// Protected: user must be authenticated to view their own orders
+router.get("/user/:userId", generalLimiter, requireAuth, getOrdersByUser);
 router.post("/create", generalLimiter, createOrder);
 router.patch("/:id/payment-attempt", generalLimiter, updatePaymentAttempt);
 router.post("/:id/log-attempt", generalLimiter, logPaymentAttempt);

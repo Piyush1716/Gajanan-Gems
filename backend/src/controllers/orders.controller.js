@@ -240,11 +240,11 @@ export async function updateOrderStatus(req, res, next) {
  */
 export async function getOrdersByUser(req, res, next) {
   try {
-    const userId = parseInt(req.params.userId, 10);
+    const userId = req.params.userId?.trim();
 
     console.log(`[orders] Fetching orders for user_id=${userId}`);
 
-    if (isNaN(userId)) {
+    if (!userId) {
       return res.status(400).json({ error: "Invalid user ID" });
     }
 
@@ -294,7 +294,7 @@ export async function trackOrder(req, res, next) {
       .eq("email", email.trim().toLowerCase());
 
     if (userId) {
-      query = query.eq("user_id", parseInt(userId, 10));
+      query = query.eq("user_id", userId.trim());
     }
 
     const { data, error } = await query.single();
