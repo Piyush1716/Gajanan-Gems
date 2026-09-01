@@ -1,4 +1,4 @@
-﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";

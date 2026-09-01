@@ -1,4 +1,4 @@
-﻿import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { PageBanner } from "@/components/PageBanner";
 import { ContactForm } from "@/components/ContactForm";

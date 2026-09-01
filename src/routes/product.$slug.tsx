@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft, ShoppingBag, ArrowRight } from "lucide-react";
 import { Header } from "@/components/site/Header";

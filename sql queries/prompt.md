@@ -1,4 +1,4 @@
-﻿Homepage Structure : 
+Homepage Structure : 
 Hero Banner
 Shop by Category
 Best Sellers

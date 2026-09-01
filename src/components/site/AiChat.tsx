@@ -1,4 +1,4 @@
-﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Bot, User, Loader2, Trash2 } from "lucide-react";
 

@@ -1,4 +1,4 @@
-﻿import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useCallback } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";

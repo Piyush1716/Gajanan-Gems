@@ -1,4 +1,4 @@
-﻿/**
+/**
  * backend/src/index.js — Express App Entry Point
  *
  * Start: node --watch src/index.js  (or npm run dev from backend/)

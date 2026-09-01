@@ -1,4 +1,4 @@
-﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { Link } from "@tanstack/react-router";
 import { Instagram, Facebook, Youtube, Mail, Phone } from "lucide-react";
 

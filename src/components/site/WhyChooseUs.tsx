@@ -1,4 +1,4 @@
-﻿import { Link } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { CheckCircle } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
