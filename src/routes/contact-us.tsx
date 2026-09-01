@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { PageBanner } from "@/components/PageBanner";
@@ -8,12 +8,12 @@ import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 export const Route = createFileRoute("/contact-us")({
   head: () => ({
     meta: [
-      { title: "Contact Us — GajananGems" },
+      { title: "Contact Us — Cambay Crystal" },
       {
         name: "description",
-        content: `Get in touch with GajananGems. Email ${CONTACT_EMAIL}, call +91 ${CONTACT_PHONE}, or visit us in Khambhat.`,
+        content: `Get in touch with Cambay Crystal. Email ${CONTACT_EMAIL}, call +91 ${CONTACT_PHONE}, or visit us in Khambhat.`,
       },
-      { property: "og:title", content: "Contact Us — GajananGems" },
+      { property: "og:title", content: "Contact Us — Cambay Crystal" },
       { property: "og:url", content: "/contact-us" },
     ],
     links: [{ rel: "canonical", href: "/contact-us" }],

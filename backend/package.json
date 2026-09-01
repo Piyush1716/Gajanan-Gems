@@ -1,7 +1,7 @@
-{
-  "name": "gajanangems-backend",
+﻿{
+  "name": "Cambay Crystal-backend",
   "version": "1.0.0",
-  "description": "Express backend for GajananGems ecommerce",
+  "description": "Express backend for Cambay Crystal ecommerce",
   "type": "module",
   "main": "src/index.js",
   "scripts": {

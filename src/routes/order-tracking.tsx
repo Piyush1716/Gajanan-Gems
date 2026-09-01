@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
@@ -11,13 +11,13 @@ import { Search, Package, CheckCircle2, Clock, Truck, XCircle, Loader2, AlertCir
 export const Route = createFileRoute("/order-tracking")({
   head: () => ({
     meta: [
-      { title: "Order Tracking — GajananGems" },
+      { title: "Order Tracking — Cambay Crystal" },
       {
         name: "description",
         content:
-          "Track your GajananGems order. Enter your Order ID and billing email to check your order status.",
+          "Track your Cambay Crystal order. Enter your Order ID and billing email to check your order status.",
       },
-      { property: "og:title", content: "Order Tracking — GajananGems" },
+      { property: "og:title", content: "Order Tracking — Cambay Crystal" },
       { property: "og:url", content: "/order-tracking" },
     ],
     links: [{ rel: "canonical", href: "/order-tracking" }],

@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -38,13 +38,13 @@ const cancellationSteps = [
 export const Route = createFileRoute("/faq")({
   head: () => ({
     meta: [
-      { title: "FAQ — GajananGems" },
+      { title: "FAQ — Cambay Crystal" },
       {
         name: "description",
         content:
-          "Frequently asked questions about GajananGems: COD, order confirmation, packaging, payment security, delivery times and order cancellation.",
+          "Frequently asked questions about Cambay Crystal: COD, order confirmation, packaging, payment security, delivery times and order cancellation.",
       },
-      { property: "og:title", content: "Frequently Asked Questions — GajananGems" },
+      { property: "og:title", content: "Frequently Asked Questions — Cambay Crystal" },
       { property: "og:url", content: "/faq" },
     ],
     links: [{ rel: "canonical", href: "/faq" }],

@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+﻿import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
@@ -34,7 +34,7 @@ serve(async (req) => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "Gajanan Gems <onboarding@resend.dev>", // Make sure you verify this domain in Resend
+        from: "Cambay Crystal <onboarding@resend.dev>", // Make sure you verify this domain in Resend
         to: [email],
         subject: `Order Confirmation - Order #${orderId}`,
         html: `
@@ -47,7 +47,7 @@ serve(async (req) => {
             <p>We are getting everything ready. We will notify you once your order is shipped.</p>
             <br/>
             <p>Best regards,</p>
-            <p><strong>Gajanan Gems Team</strong></p>
+            <p><strong>Cambay Crystal Team</strong></p>
           </div>
         `,
       }),

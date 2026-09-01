@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -6,13 +6,13 @@ import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 export const Route = createFileRoute("/returns-refund-policy")({
   head: () => ({
     meta: [
-      { title: "Returns & Refund Policy — GajananGems" },
+      { title: "Returns & Refund Policy — Cambay Crystal" },
       {
         name: "description",
         content:
-          "GajananGems returns and refund policy: eligibility, return shipping, inspection, refund timeframe and non-returnable items.",
+          "Cambay Crystal returns and refund policy: eligibility, return shipping, inspection, refund timeframe and non-returnable items.",
       },
-      { property: "og:title", content: "Returns & Refund Policy — GajananGems" },
+      { property: "og:title", content: "Returns & Refund Policy — Cambay Crystal" },
       { property: "og:url", content: "/returns-refund-policy" },
     ],
     links: [{ rel: "canonical", href: "/returns-refund-policy" }],
@@ -26,7 +26,7 @@ function ReturnsPage() {
       <PageBanner title="Returns and Refund Policy" crumb="Returns and Refund Policy" />
       <article className="prose-policy mx-auto max-w-3xl px-4 py-12">
         <p>
-          Thank you for shopping with GajananGems. We appreciate your business and want to ensure
+          Thank you for shopping with Cambay Crystal. We appreciate your business and want to ensure
           your satisfaction with our products. Please review our return and refund policy carefully.
         </p>
         <h4>1. Return Eligibility</h4>
@@ -90,7 +90,7 @@ function ReturnsPage() {
         </p>
         <p>
           Note: This return and refund policy is subject to change without notice. Please check our
-          website for the most up-to-date policy information. Thank you for choosing GajananGems.
+          website for the most up-to-date policy information. Thank you for choosing Cambay Crystal.
         </p>
       </article>
     </StaticPageLayout>

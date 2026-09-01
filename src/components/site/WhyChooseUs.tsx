@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 import { CheckCircle } from "lucide-react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
@@ -66,7 +66,7 @@ export function WhyChooseUs() {
               Why Choose Us
             </p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold font-display mb-6 sm:mb-8 leading-tight">
-              Why Choose Gajanan Gems?
+              Why Choose Cambay Crystal?
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

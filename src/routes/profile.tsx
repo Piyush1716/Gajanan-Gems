@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
@@ -26,7 +26,7 @@ import {
 export const Route = createFileRoute("/profile")({
   head: () => ({
     meta: [
-      { title: "My Account — GajananGems" },
+      { title: "My Account — Cambay Crystal" },
       { name: "description", content: "View your profile and order history." },
     ],
   }),

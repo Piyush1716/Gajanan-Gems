@@ -1,4 +1,4 @@
-import { Link } from "@tanstack/react-router";
+﻿import { Link } from "@tanstack/react-router";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 export function OurStory() {
@@ -51,7 +51,7 @@ export function OurStory() {
 
             <p className="text-sm sm:text-base leading-relaxed text-muted-foreground mb-4">
               Natural gemstones have been part of India's heritage for centuries.
-              At Gajanan Gems, every gemstone is carefully selected, polished,
+              At Cambay Crystal, every gemstone is carefully selected, polished,
               and crafted with attention to quality and authenticity.
             </p>
             <p className="text-sm sm:text-base leading-relaxed text-muted-foreground mb-8">

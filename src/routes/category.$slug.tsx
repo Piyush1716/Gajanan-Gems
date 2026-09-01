@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import {
@@ -25,7 +25,7 @@ export const Route = createFileRoute("/category/$slug")({
   },
   head: ({ loaderData }) => ({
     meta: [
-      { title: `${loaderData?.category.name ?? "Category"} — GajananGems` },
+      { title: `${loaderData?.category.name ?? "Category"} — Cambay Crystal` },
       { name: "description", content: loaderData?.category.description ?? "Shop healing crystals and gemstone jewellery." },
     ],
   }),

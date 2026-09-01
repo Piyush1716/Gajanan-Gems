@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+﻿import { useState, useCallback, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -144,7 +144,7 @@ function EmailConfirmationScreen({
         {/* Steps */}
         <ol className="text-left w-full space-y-2 mb-5">
           {[
-            "Open the email from GajananGems",
+            "Open the email from Cambay Crystal",
             "Click \"Confirm your email\"",
             "You'll be signed in automatically",
           ].map((step, i) => (
@@ -302,7 +302,7 @@ export function LoginModal() {
                 : <Gem className="h-7 w-7 text-primary" />}
             </div>
             <DialogTitle className="text-xl font-bold tracking-tight text-center">
-              {pendingEmail ? "Verify your email" : "Welcome to GajananGems"}
+              {pendingEmail ? "Verify your email" : "Welcome to Cambay Crystal"}
             </DialogTitle>
             <DialogDescription className="text-muted-foreground text-center">
               {pendingEmail

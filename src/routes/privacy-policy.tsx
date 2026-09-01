@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -6,13 +6,13 @@ import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 export const Route = createFileRoute("/privacy-policy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy — GajananGems" },
+      { title: "Privacy Policy — Cambay Crystal" },
       {
         name: "description",
         content:
-          "How GajananGems collects, uses, shares and protects your personal information when you use our website.",
+          "How Cambay Crystal collects, uses, shares and protects your personal information when you use our website.",
       },
-      { property: "og:title", content: "Privacy Policy — GajananGems" },
+      { property: "og:title", content: "Privacy Policy — Cambay Crystal" },
       { property: "og:url", content: "/privacy-policy" },
     ],
     links: [{ rel: "canonical", href: "/privacy-policy" }],
@@ -79,7 +79,7 @@ function PrivacyPage() {
         <h4>Links to Other Sites</h4>
         <p>
           Our website links to other websites that may collect personally identifiable information
-          about you. GajananGems is not responsible for the privacy practices or content of those
+          about you. Cambay Crystal is not responsible for the privacy practices or content of those
           linked websites.
         </p>
         <h4>Security Precautions</h4>
@@ -92,8 +92,8 @@ function PrivacyPage() {
         <h4>Choice / Opt-Out</h4>
         <p>
           We provide all users the opportunity to opt out of receiving non-essential (promotional,
-          marketing-related) communications. To remove your contact information from all GajananGems
-          lists and newsletters, please email us at hello@gajanangems.com.
+          marketing-related) communications. To remove your contact information from all Cambay Crystal
+          lists and newsletters, please email us at hello@Cambay Crystal.com.
         </p>
         <h4>Your Consent</h4>
         <p>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { ContactForm } from "@/components/ContactForm";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -6,13 +6,13 @@ import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 export const Route = createFileRoute("/bulk-order")({
   head: () => ({
     meta: [
-      { title: "Bulk Order — GajananGems" },
+      { title: "Bulk Order — Cambay Crystal" },
       {
         name: "description",
         content:
-          "GajananGems accepts bulk orders for wholesalers, retailers and businesses, with customization options for branding and packaging.",
+          "Cambay Crystal accepts bulk orders for wholesalers, retailers and businesses, with customization options for branding and packaging.",
       },
-      { property: "og:title", content: "Bulk Order — GajananGems" },
+      { property: "og:title", content: "Bulk Order — Cambay Crystal" },
       { property: "og:url", content: "/bulk-order" },
     ],
     links: [{ rel: "canonical", href: "/bulk-order" }],
@@ -27,7 +27,7 @@ function BulkOrderPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <article className="prose-policy">
           <p>
-            At GajananGems, we are proud to announce that we accept bulk orders. Whether you are a
+            At Cambay Crystal, we are proud to announce that we accept bulk orders. Whether you are a
             wholesaler, retailer, or business in need of a large quantity of products, we have the
             capacity and expertise to fulfill your requirements.
           </p>

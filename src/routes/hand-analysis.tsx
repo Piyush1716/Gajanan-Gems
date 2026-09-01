@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState, useRef, useCallback } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -21,7 +21,7 @@ import {
 export const Route = createFileRoute("/hand-analysis")({
   head: () => ({
     meta: [
-      { title: "Palm & Aura Analysis — GajananGems" },
+      { title: "Palm & Aura Analysis — Cambay Crystal" },
       {
         name: "description",
         content:

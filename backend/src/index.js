@@ -1,4 +1,4 @@
-/**
+﻿/**
  * backend/src/index.js — Express App Entry Point
  *
  * Start: node --watch src/index.js  (or npm run dev from backend/)
@@ -58,7 +58,7 @@ app.use(errorHandler);
 // They just need the Express app exported.
 if (process.env.NODE_ENV !== "production") {
   app.listen(PORT, () => {
-    console.log(`\n🚀 GajananGems backend running at http://localhost:${PORT}`);
+    console.log(`\n🚀 Cambay Crystal backend running at http://localhost:${PORT}`);
     console.log("   Endpoints:");
     console.log("   GET  /api/health");
     console.log("   GET  /api/products");

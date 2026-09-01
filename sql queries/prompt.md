@@ -1,8 +1,8 @@
-Homepage Structure : 
+﻿Homepage Structure : 
 Hero Banner
 Shop by Category
 Best Sellers
-Why Choose Gajanan Gems
+Why Choose Cambay Crystal
 Our Story (Split Section)
 Meet Our Artisans
 Our Craftsmanship
@@ -12,10 +12,10 @@ Customer Reviews
 Numbers Section
 Footer
 
-1. Why Choose Gajanan Gems
+1. Why Choose Cambay Crystal
 Layout
 Left (Text)
-Why Choose Gajanan Gems?
+Why Choose Cambay Crystal?
 100% Natural Gemstones
 Carefully Handpicked
 Premium Quality Finish
@@ -42,7 +42,7 @@ Bracelet making
 workshop
 Right
 From the Heart of 
-Natural gemstones have been part of India's heritage for centuries. At Gajanan Gems, every gemstone is carefully selected, polished, and crafted with attention to quality and authenticity.
+Natural gemstones have been part of India's heritage for centuries. At Cambay Crystal, every gemstone is carefully selected, polished, and crafted with attention to quality and authenticity.
 Our goal is simple—to bring beautiful natural gemstones and handcrafted spiritual products to customers around the world while preserving traditional craftsmanship.
 Button
 Learn More

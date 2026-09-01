@@ -98,7 +98,7 @@ export function Header() {
         {/* Logo */}
         <Link to="/" className="flex items-center flex-shrink-0">
           <span className="text-2xl lg:text-3xl font-display font-semibold tracking-tight" style={{ fontFamily: "var(--font-display)" }}>
-            Gajanan<span className="text-primary">Gems</span>
+            Cambay<span className="text-primary">Crystal</span>
           </span>
         </Link>
 

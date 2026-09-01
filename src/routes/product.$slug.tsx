@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useState, useCallback } from "react";
 import { Star, Heart, Minus, Plus, Truck, ShieldCheck, Sparkles, ChevronRight, ChevronLeft, ShoppingBag, ArrowRight } from "lucide-react";
 import { Header } from "@/components/site/Header";
@@ -12,14 +12,14 @@ export const Route = createFileRoute("/product/$slug")({
     const product = loaderData?.product as Product | undefined;
     return {
       meta: [
-        { title: product ? `${product.name} — GajananGems` : "Product — GajananGems" },
+        { title: product ? `${product.name} — Cambay Crystal` : "Product — Cambay Crystal" },
         {
           name: "description",
           content: product?.shortDescription
             ? product.shortDescription.slice(0, 160)
-            : "Shop premium authentic healing crystals, gemstone bracelets, and spiritual decor from GajananGems. Free delivery on all orders!",
+            : "Shop premium authentic healing crystals, gemstone bracelets, and spiritual decor from Cambay Crystal. Free delivery on all orders!",
         },
-        { property: "og:title", content: product ? `${product.name} — GajananGems` : "GajananGems" },
+        { property: "og:title", content: product ? `${product.name} — Cambay Crystal` : "Cambay Crystal" },
         { property: "og:image", content: product?.img ?? "" },
         { property: "og:type", content: "product" },
       ],

@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useWishlist } from "@/lib/wishlist";
@@ -8,8 +8,8 @@ import { Heart, ShoppingBag, Trash2 } from "lucide-react";
 export const Route = createFileRoute("/wishlist")({
   head: () => ({
     meta: [
-      { title: "Wishlist — GajananGems" },
-      { name: "description", content: "Your saved crystals and gemstone bracelets on GajananGems." },
+      { title: "Wishlist — Cambay Crystal" },
+      { name: "description", content: "Your saved crystals and gemstone bracelets on Cambay Crystal." },
     ],
   }),
   component: WishlistPage,

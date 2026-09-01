@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+﻿import { createFileRoute } from "@tanstack/react-router";
 import { Sparkles } from "lucide-react";
 import { PageBanner } from "@/components/PageBanner";
 import { ContactForm } from "@/components/ContactForm";
@@ -49,13 +49,13 @@ const faqs = [
 export const Route = createFileRoute("/customized-bracelet")({
   head: () => ({
     meta: [
-      { title: "Create Your Own Customized Crystal Bracelet — GajananGems" },
+      { title: "Create Your Own Customized Crystal Bracelet — Cambay Crystal" },
       {
         name: "description",
         content:
           "Design your own customized crystal bracelet online in India. Choose natural crystal beads, bead size and wrist size — handmade authentic healing bracelets.",
       },
-      { property: "og:title", content: "Customized Crystal Bracelet — GajananGems" },
+      { property: "og:title", content: "Customized Crystal Bracelet — Cambay Crystal" },
       { property: "og:url", content: "/customized-bracelet" },
     ],
     links: [{ rel: "canonical", href: "/customized-bracelet" }],
@@ -74,7 +74,7 @@ function CustomBraceletPage() {
       <div className="mx-auto max-w-3xl px-4 py-12">
         <article className="prose-policy">
           <p>
-            Welcome to GajananGems — India's first platform where you can create your own
+            Welcome to Cambay Crystal — India's first platform where you can create your own
             customized crystal bracelet online with complete flexibility.
           </p>
           <p>

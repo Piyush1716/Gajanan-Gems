@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useCart } from "@/lib/cart";
@@ -8,7 +8,7 @@ import { Minus, Plus, Trash2, ShoppingBag } from "lucide-react";
 export const Route = createFileRoute("/cart")({
   head: () => ({
     meta: [
-      { title: "Your Cart — GajananGems" },
+      { title: "Your Cart — Cambay Crystal" },
       { name: "description", content: "Review the crystals and bracelets in your cart before checkout." },
     ],
   }),

@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { useEffect, useRef, useState } from "react";
 import { MessageCircle, X, Send, Bot, User, Loader2, Trash2 } from "lucide-react";
 
@@ -7,7 +7,7 @@ const STORAGE_KEY = "shubh_chat_v1";
 const CHAT_API_URL = (import.meta.env.VITE_CHAT_API_URL as string | undefined)?.replace(/\/$/, "");
 const WELCOME: Message = {
   role: "bot",
-  text: "👋 Hi! I'm GajananGems Assistant. Ask me anything about our crystals, bracelets, or healing gemstones. 💎",
+  text: "👋 Hi! I'm Cambay Crystal Assistant. Ask me anything about our crystals, bracelets, or healing gemstones. 💎",
 };
 
 export function AiChat() {
@@ -111,7 +111,7 @@ export function AiChat() {
             <div className="flex items-center gap-2">
               <Bot className="h-5 w-5" />
               <div>
-                <p className="font-semibold text-sm leading-none">GajananGems Assistant</p>
+                <p className="font-semibold text-sm leading-none">Cambay Crystal Assistant</p>
                 <p className="text-[10px] opacity-80 mt-0.5">Ask about crystals &amp; healing</p>
               </div>
             </div>

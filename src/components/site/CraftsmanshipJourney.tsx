@@ -1,4 +1,4 @@
-import {
+﻿import {
   Mountain,
   Scissors,
   Sparkles,
@@ -347,7 +347,7 @@ export function CraftsmanshipJourney() {
           <p className="text-muted-foreground mt-3 text-sm sm:text-base max-w-2xl mx-auto">
             From deep within the earth to your doorstep — every gemstone passes
             through 7 meticulous stages of craftsmanship before it becomes a
-            Gajanan Gems product.
+            Cambay Crystal product.
           </p>
         </div>
 

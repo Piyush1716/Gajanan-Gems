@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import DOMPurify from "dompurify";
 import { Header } from "@/components/site/Header";
@@ -14,8 +14,8 @@ export const Route = createFileRoute("/order-confirmation")({
   }),
   head: () => ({
     meta: [
-      { title: "Order Confirmed — GajananGems" },
-      { name: "description", content: "Your GajananGems order has been placed successfully." },
+      { title: "Order Confirmed — Cambay Crystal" },
+      { name: "description", content: "Your Cambay Crystal order has been placed successfully." },
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),

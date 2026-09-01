@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+﻿import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -7,7 +7,7 @@ import { fetchAllCategories, type Category } from "@/lib/products";
 export const Route = createFileRoute("/categories")({
   head: () => ({
     meta: [
-      { title: "All Categories — GajananGems" },
+      { title: "All Categories — Cambay Crystal" },
       { name: "description", content: "Browse all our healing crystal and gemstone categories." },
     ],
   }),

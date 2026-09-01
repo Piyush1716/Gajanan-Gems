@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute } from "@tanstack/react-router";
 import { PageBanner } from "@/components/PageBanner";
 import { StaticPageLayout } from "@/components/site/StaticPageLayout";
@@ -6,13 +6,13 @@ import { StaticPageLayout } from "@/components/site/StaticPageLayout";
 export const Route = createFileRoute("/about-us")({
   head: () => ({
     meta: [
-      { title: "About Us — GajananGems" },
+      { title: "About Us — Cambay Crystal" },
       {
         name: "description",
         content:
-          "Learn about GajananGems, rooted in Khambhat — India's agate capital — offering authentic spiritual & holistic healing products since 2010.",
+          "Learn about Cambay Crystal, rooted in Khambhat — India's agate capital — offering authentic spiritual & holistic healing products since 2010.",
       },
-      { property: "og:title", content: "About Us — GajananGems" },
+      { property: "og:title", content: "About Us — Cambay Crystal" },
       { property: "og:url", content: "/about-us" },
     ],
     links: [{ rel: "canonical", href: "/about-us" }],
@@ -27,7 +27,7 @@ function AboutPage() {
       <article className="prose-policy mx-auto max-w-3xl px-4 py-12">
         <h4>What We Do</h4>
         <p>
-          GajananGems is a one stop destination for all your affordable Spiritual &amp; Holistic
+          Cambay Crystal is a one stop destination for all your affordable Spiritual &amp; Holistic
           Healing requirements. Our extensive product line includes everything from Reiki products,
           Crystals, Healing stone accessories, Gem Trees, Angels, Yantras, Pyramids, Jap Malas,
           precious and semi precious items, and much more each piece handcrafted with care and
@@ -36,7 +36,7 @@ function AboutPage() {
 
         <h4>Rooted in Khambhat — India's Agate Capital</h4>
         <p>
-          GajananGems is proudly based in Khambhat, Gujarat the historic heartland of agate and
+          Cambay Crystal is proudly based in Khambhat, Gujarat the historic heartland of agate and
           gemstone craftsmanship. Khambhat has been the central hub for agate and healing stone
           products for centuries. Nearly every agate product you find across India and around the
           world passes through Khambhat, where generations of skilled artisans hand craft these
@@ -50,7 +50,7 @@ function AboutPage() {
 
         <h4>Our Story</h4>
         <p>
-          GajananGems was founded in 2010 with a clear vision: to bring genuine, handcrafted
+          Cambay Crystal was founded in 2010 with a clear vision: to bring genuine, handcrafted
           healing crystals and spiritual products to customers across India and the world. What
           began as a local endeavour in Khambhat has grown into a trusted name that exports
           products globally, reaching customers across continents who seek authentic healing stones
@@ -64,10 +64,10 @@ function AboutPage() {
 
         <h4>About Chunara Mayank</h4>
         <p>
-          GajananGems is led by <strong>Chunara Mayank</strong>, whose deep roots in Khambhat's
+          Cambay Crystal is led by <strong>Chunara Mayank</strong>, whose deep roots in Khambhat's
           gemstone industry have shaped the brand from its very beginning. With a hands on
           understanding of every step from raw stone to finished product Mayank has built
-          GajananGems on a foundation of trust, craftsmanship, and a genuine passion for healing
+          Cambay Crystal on a foundation of trust, craftsmanship, and a genuine passion for healing
           crystals. His dedication ensures that every product leaving our workshop meets the
           highest standards of quality and authenticity.
         </p>

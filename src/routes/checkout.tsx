@@ -1,4 +1,4 @@
-import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
+﻿import { CONTACT_EMAIL, CONTACT_PHONE } from "@/config";
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
@@ -27,7 +27,7 @@ export const Route = createFileRoute("/checkout")({
   }),
   head: () => ({
     meta: [
-      { title: "Checkout — GajananGems" },
+      { title: "Checkout — Cambay Crystal" },
       { name: "description", content: "Securely complete your order for healing crystals and gemstone jewellery." },
     ],
   }),
@@ -373,7 +373,7 @@ function CheckoutPage() {
       key: RAZORPAY_KEY,
       amount: total * 100, // paise
       currency: "INR",
-      name: "GajananGems",
+      name: "Cambay Crystal",
       description: `Order #${orderId} — Healing Crystals & Jewellery`,
       // order_id ties this modal to the server-side Razorpay order
       // This is required for Standard Checkout signature verification

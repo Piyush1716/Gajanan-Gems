@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+﻿import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { Header } from "@/components/site/Header";
 import { Footer } from "@/components/site/Footer";
 import { useEffect, useState, useCallback } from "react";
@@ -15,7 +15,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: z.object({ q: z.string().optional() }),
   head: ({ match }) => ({
     meta: [
-      { title: match.search.q ? `Search: "${match.search.q}" — GajananGems` : "Search — GajananGems" },
+      { title: match.search.q ? `Search: "${match.search.q}" — Cambay Crystal` : "Search — Cambay Crystal" },
       { name: "description", content: "Search our collection of healing crystals and gemstone jewellery." },
     ],
   }),
